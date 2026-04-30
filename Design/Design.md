@@ -43,4 +43,4 @@ Vue Router ayudará a la fluidez de la web en la que estará desarrollado el jue
 
 # Mockups.
 
-![Mockups inicio, inventario y posible screamer](https://drive.google.com/file/d/1lpNhaNeD--VDxzSkbIT0dzp3R81_CoCu/view?usp=drive_link)
+![Mockups inicio, inventario y posible screamer](https://lh3.googleusercontent.com/d/1lpNhaNeD--VDxzSkbIT0dzp3R81_CoCu)
