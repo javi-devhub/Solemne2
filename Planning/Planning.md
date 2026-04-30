@@ -8,9 +8,9 @@
 
 | Día              | Actividad planificada                                                                                                                      | Estado |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
-| Lunes 4 de mayo  | Definir la idea principal del juego, el contexto narrativo, el tipo de terror psicológico y la mecánica cooperativa base.                  | ☐      |
-| Martes 5 de mayo | Establecer los requisitos del proyecto mediante MoSCoW, definiendo funcionalidades obligatorias, deseables, opcionales y fuera de alcance. | ☐      |
-| Jueves 7 de mayo | Definir la tecnología a utilizar, la estructura general del proyecto, las pantallas principales y la organización inicial del repositorio. | ☐      |
+| Lunes 27 de abril  | Definir la idea principal del juego, el contexto narrativo, el tipo de terror psicológico y la mecánica cooperativa base.                  | ☐      |
+| Martes 28 de abril | Establecer los requisitos del proyecto mediante MoSCoW, definiendo funcionalidades obligatorias, deseables, opcionales y fuera de alcance. | ☐      |
+| Jueves 30 de abril | Definir la tecnología a utilizar, la estructura general del proyecto, las pantallas principales y la organización inicial del repositorio. | ☐      |
 
 ---
 
@@ -18,9 +18,9 @@
 
 | Día               | Actividad planificada                                                                                                                           | Estado |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| Lunes 11 de mayo  | Diseñar la primera escena jugable, incluyendo ambiente, objetos inspeccionables, pistas y objetivo principal de la habitación.                  | ☐      |
-| Martes 12 de mayo | Diseñar los puzzles cooperativos principales, considerando percepción distinta entre jugadores, pistas compartidas y condiciones de resolución. | ☐      |
-| Jueves 14 de mayo | Elaborar mockups de las pantallas principales, HUD, inventario, panel de pistas y eventos de tensión como glitches o screamers.                 | ☐      |
+| Lunes 4 de mayo  | Diseñar la primera escena jugable, incluyendo ambiente, objetos inspeccionables, pistas y objetivo principal de la habitación.                  | ☐      |
+| Martes 5 de mayo | Diseñar los puzzles cooperativos principales, considerando percepción distinta entre jugadores, pistas compartidas y condiciones de resolución. | ☐      |
+| Jueves 7 de mayo | Elaborar mockups de las pantallas principales, HUD, inventario, panel de pistas y eventos de tensión como glitches o screamers.                 | ☐      |
 
 ---
 
@@ -28,9 +28,9 @@
 
 | Día               | Actividad planificada                                                                                                              | Estado |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| Lunes 18 de mayo  | Implementar la base visual del juego, incluyendo pantalla de inicio, pantalla principal y estructura dividida para dos jugadores.  | ☐      |
-| Martes 19 de mayo | Implementar elementos básicos de gameplay, como movimiento, HUD, inventario, objetos inspeccionables y mensajes de interacción.    | ☐      |
-| Jueves 21 de mayo | Integrar la lógica cooperativa, incorporando pistas diferentes para cada jugador, condiciones de avance y primer puzzle funcional. | ☐      |
+| Lunes 11 de mayo  | Implementar la base visual del juego, incluyendo pantalla de inicio, pantalla principal y estructura dividida para dos jugadores.  | ☐      |
+| Martes 12 de mayo | Implementar elementos básicos de gameplay, como movimiento, HUD, inventario, objetos inspeccionables y mensajes de interacción.    | ☐      |
+| Jueves 14 de mayo | Integrar la lógica cooperativa, incorporando pistas diferentes para cada jugador, condiciones de avance y primer puzzle funcional. | ☐      |
 
 ---
 
@@ -38,8 +38,8 @@
 
 | Día               | Actividad planificada                                                                                                                     | Estado |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| Lunes 25 de mayo  | Implementar eventos de tensión, como screamer, glitch visual o aparición de la presencia, además de consecuencias por errores.            | ☐      |
-| Martes 26 de mayo | Realizar pruebas del flujo completo del juego, revisar errores, ajustar mecánicas y validar puzzles, inventario y visibilidad de objetos. | ☐      |
+| Lunes 18 de mayo  | Implementar eventos de tensión, como screamer, glitch visual o aparición de la presencia, además de consecuencias por errores.            | ☐      |
+| Martes 19 de mayo | Realizar pruebas del flujo completo del juego, revisar errores, ajustar mecánicas y validar puzzles, inventario y visibilidad de objetos. | ☐      |
 
 ---
 
