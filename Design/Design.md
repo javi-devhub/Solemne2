@@ -85,11 +85,11 @@ Flujo del juego.
 │   │   ├── mainGame.ts
 │   │   │
 │   │   ├── scenes/
-│   │   │   ├── BootScene.ts
-│   │   │   ├── PreloadScene.ts
-│   │   │   ├── ChildhoodRoomScene.ts
-│   │   │   ├── TapeScene.ts
-│   │   │   └── ObserverScene.ts
+│   │   │   ├── Scene1.ts
+│   │   │   ├── Scene2.ts
+│   │   │   ├── Scene3.ts
+│   │   │   ├── Scene4.ts
+│   │   │   └── Scene5.ts
 │   │   │
 │   │   ├── objects/
 │   │   │   ├── Player.ts
