@@ -29,24 +29,22 @@ Flujo del juego.
 
 # Especificaciones tecnológicas
 
-| Categoría             | Dependencias / herramientas | Propósito                                                                      |
-| --------------------- | --------------------------- | ------------------------------------------------------------------------------ |
-| Framework frontend    | Vue 3                       | Permitirá organizar el proyecto mediante componentes reutilizables, manejar pantallas del juego y actualizar visualmente la interfaz cuando cambie el estado de los jugadores.                   |
-| Entorno de desarrollo | Vite                        | Ayudará a levantar el servidor de desarrollo y hacer un hot reload (cambios al instante)                                   |
-| Motor juego 2D        | Phaser            | Ya que incluye herramientas para el sistema de físicas, animaciones, posición de objetos, cambios de escena, etc.
-                                     |
-| Lenguaje              | TypeScript                  | Ya que ayuda a escribir el juego de forma más ordenada.                                      |
-| Estado global         | Pinia                       | Ya que es un gestor de Vue, es un store (lugar donde se guarda el estado del juego)                        |
-| Navegación            | Vue Router                  | Cambio entre pantallas del juego: inicio, gameplay, pausa, victoria y derrota. |
-| Testing               | Vitest y Vue Test Utils     | Además de estar basado en *Vite* permitirá hacer testing compatible con los proyectos.                                |
-| Calidad de código     | ESLint y Prettier           | Revisión, formato y consistencia del código.                                   |
-| Gestor de paquetes    | pnpm                        | Instalación y administración de dependencias.                                  |
-| Contenedores          | Docker                      | Ejecución del proyecto en un entorno controlado.                               |
-| Automatización        | GitHub Actions              | Pruebas y build automático del proyecto.                                       |
-
+| Categoría             | Dependencias / herramientas | Propósito                                                                                                                                                                      |
+| --------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Framework frontend    | Vue 3                       | Permitirá organizar el proyecto mediante componentes reutilizables, manejar pantallas del juego y actualizar visualmente la interfaz cuando cambie el estado de los jugadores. |
+| Entorno de desarrollo | Vite                        | Ayudará a levantar el servidor de desarrollo y realizar hot reload, es decir, cambios al instante durante el desarrollo.                                                       |
+| Motor de juego 2D     | Phaser                      | Incluye herramientas para el sistema de físicas, animaciones, posición de objetos, cambios de escena y lógica visual del juego.                                                |
+| Lenguaje              | TypeScript                  | Ayuda a escribir el juego de forma más ordenada y con mejor control de errores.                                                                                                |
+| Estado global         | Pinia                       | Gestor de estado de Vue. Se utilizará como store para guardar el estado general del juego.                                                                                     |
+| Navegación            | Vue Router                  | Permitirá cambiar entre pantallas del juego, como inicio, gameplay, pausa, victoria y derrota.                                                                                 |
+| Testing               | Vitest y Vue Test Utils     | Además de estar basado en Vite, permitirá realizar testing compatible con los proyectos Vue.                                                                                   |
+| Calidad de código     | ESLint y Prettier           | Permitirán revisar, formatear y mantener la consistencia del código.                                                                                                           |
+| Gestor de paquetes    | pnpm                        | Permitirá instalar y administrar las dependencias del proyecto.                                                                                                                |
+| Contenedores          | Docker                      | Permitirá ejecutar el proyecto en un entorno controlado.                                                                                                                       |
+| Automatización        | GitHub Actions              | Permitirá ejecutar pruebas y build automático del proyecto.                                                                                                                    |
 # Organización de las carpetas
 
-nombre-del-juego/
+```nombre-del-juego/
 │
 ├── public/
 │   └── assets/
