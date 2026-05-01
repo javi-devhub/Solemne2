@@ -44,7 +44,7 @@ Flujo del juego.
 | Automatización        | GitHub Actions              | Permitirá ejecutar pruebas y build automático del proyecto.                                                                                                                    |
 # Organización de las carpetas
 
-```nombre-del-juego/
+```proyecto-juego/
 │
 ├── public/
 │   └── assets/
@@ -61,16 +61,17 @@ Flujo del juego.
 │   │
 │   ├── components/
 │   │   ├── game/
-│   │   │   ├── PlayerPanel.vue
+│   │   │   ├── GameCanvas.vue
+│   │   │   ├── PlayerHUD.vue
 │   │   │   ├── InventoryBar.vue
 │   │   │   ├── CluePanel.vue
 │   │   │   ├── InteractionPrompt.vue
 │   │   │   └── ScreamerOverlay.vue
 │   │   │
-│   │   ├── ui/
-│   │   │   ├── BaseButton.vue
-│   │   │   ├── BaseModal.vue
-│   │   │   └── DialogBox.vue
+│   │   └── ui/
+│   │       ├── BaseButton.vue
+│   │       ├── BaseModal.vue
+│   │       └── DialogBox.vue
 │   │
 │   ├── views/
 │   │   ├── HomeView.vue
@@ -79,30 +80,41 @@ Flujo del juego.
 │   │   ├── VictoryView.vue
 │   │   └── DefeatView.vue
 │   │
-│   ├── scenes/
-│   │   ├── Scene1.vue
-│   │   ├── Scene2.vue
-│   │   └── Scene3.vue
+│   ├── game/
+│   │   ├── phaserConfig.ts
+│   │   ├── mainGame.ts
+│   │   │
+│   │   ├── scenes/
+│   │   │   ├── BootScene.ts
+│   │   │   ├── PreloadScene.ts
+│   │   │   ├── ChildhoodRoomScene.ts
+│   │   │   ├── TapeScene.ts
+│   │   │   └── ObserverScene.ts
+│   │   │
+│   │   ├── objects/
+│   │   │   ├── Player.ts
+│   │   │   ├── InteractiveObject.ts
+│   │   │   ├── Door.ts
+│   │   │   └── Entity.ts
+│   │   │
+│   │   ├── systems/
+│   │   │   ├── MovementSystem.ts
+│   │   │   ├── InteractionSystem.ts
+│   │   │   ├── PuzzleSystem.ts
+│   │   │   ├── VisibilitySystem.ts
+│   │   │   └── EventSystem.ts
+│   │   │
+│   │   └── data/
+│   │       ├── rooms.ts
+│   │       ├── items.ts
+│   │       ├── clues.ts
+│   │       └── puzzles.ts
 │   │
 │   ├── stores/
 │   │   ├── gameStore.ts
 │   │   ├── playerStore.ts
 │   │   ├── inventoryStore.ts
 │   │   └── puzzleStore.ts
-│   │
-│   ├── logic/
-│   │   ├── movement.ts
-│   │   ├── interactions.ts
-│   │   ├── puzzles.ts
-│   │   ├── rngEvents.ts
-│   │   └── visibilityRules.ts
-│   │
-│   ├── data/
-│   │   ├── rooms.ts
-│   │   ├── items.ts
-│   │   ├── clues.ts
-│   │   ├── dialogues.ts
-│   │   └── puzzles.ts
 │   │
 │   ├── router/
 │   │   └── index.ts
@@ -111,12 +123,13 @@ Flujo del juego.
 │   │   ├── player.ts
 │   │   ├── item.ts
 │   │   ├── room.ts
+│   │   ├── clue.ts
 │   │   └── puzzle.ts
 │   │
 │   ├── tests/
 │   │   ├── puzzles.test.ts
-│   │   ├── rngEvents.test.ts
-│   │   └── visibilityRules.test.ts
+│   │   ├── inventory.test.ts
+│   │   └── visibility.test.ts
 │   │
 │   ├── App.vue
 │   └── main.ts
@@ -132,6 +145,7 @@ Flujo del juego.
 ├── tsconfig.json
 ├── README.md
 └── DESIGN.md
+
 ```
 
 # Mockups.
