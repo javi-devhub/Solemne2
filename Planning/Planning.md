@@ -28,9 +28,9 @@
 
 | Día               | Actividad planificada                                                                                                              | Estado |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| Lunes 11 de mayo  | Implementar la base visual del juego, incluyendo pantalla de inicio, pantalla principal y estructura dividida para dos jugadores.  | ☐      |
-| Martes 12 de mayo | Implementar elementos básicos de gameplay, como movimiento, HUD, inventario, objetos inspeccionables y mensajes de interacción.    | ☐      |
-| Jueves 14 de mayo | Integrar la lógica cooperativa, incorporando pistas diferentes para cada jugador, condiciones de avance y primer puzzle funcional. | ☐      |
+| Lunes 11 de mayo  | Implementar y testear la base visual del juego, incluyendo pantalla de inicio, pantalla principal y estructura dividida para dos jugadores.  | ☐      |
+| Martes 12 de mayo | Implementar y testear elementos básicos de gameplay, como movimiento, HUD, inventario, objetos inspeccionables y mensajes de interacción.    | ☐      |
+| Jueves 14 de mayo | Integrar y testear la lógica cooperativa, incorporando pistas diferentes para cada jugador, condiciones de avance y primer puzzle funcional. | ☐      |
 
 ---
 
@@ -38,7 +38,7 @@
 
 | Día               | Actividad planificada                                                                                                                     | Estado |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| Lunes 18 de mayo  | Implementar eventos de tensión, como screamer, glitch visual o aparición de la presencia, además de consecuencias por errores.            | ☐      |
+| Lunes 18 de mayo  | Implementar y testear eventos de tensión, como screamer, glitch visual o aparición de la presencia, además de consecuencias por errores.            | ☐      |
 | Martes 19 de mayo | Realizar pruebas del flujo completo del juego, revisar errores, ajustar mecánicas y validar puzzles, inventario y visibilidad de objetos. | ☐      |
 | Jueves 21 de mayo | Realizar testeos generales del juego completo, revisando pantallas, movimiento, HUD, inventario, objetos inspeccionables, interacción, puzzles, eventos de tensión, visibilidad diferenciada entre jugadores y flujo general del prototipo. | ☐ |
 ---
