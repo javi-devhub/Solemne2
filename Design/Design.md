@@ -29,19 +29,32 @@ Flujo del juego.
 
 # Especificaciones tecnológicas
 
-</Vue> ya que permitirá organizar el proyecto mediante componentes reutilizables, manejar pantallas del juego y actualizar visualmente la interfaz cuando cambie el estado de los jugadores.
+**Vue** ya que permitirá organizar el proyecto mediante componentes reutilizables, manejar pantallas del juego y actualizar visualmente la interfaz cuando cambie el estado de los jugadores.
 
-</Phaser> ya que incluye herramientas para el sistema de físicas, animaciones, posición de objetos, cambios de escena, etc.
+Phaser ya que incluye herramientas para el sistema de físicas, animaciones, posición de objetos, cambios de escena, etc.
 
-</Pinia> ya que es un gestor de Vue, es un store (lugar donde se guarda el estado del juego)
+Pinia ya que es un gestor de Vue, es un store (lugar donde se guarda el estado del juego)
 
-</TypeScript> ya que ayuda a escribir el juego de forma más ordenada.
+TypeScript ya que ayuda a escribir el juego de forma más ordenada.
 
-</Vite> ayudará a levantar el servidor de desarrollo y hacer un hot reload (cambios al instante)
+Vite ayudará a levantar el servidor de desarrollo y hacer un hot reload (cambios al instante)
 
-</Vue Router> ayudará a la fluidez de la web en la que estará desarrollado el juego como por ejemplo: la selección de interfaces.
+Vue Router ayudará a la fluidez de la web en la que estará desarrollado el juego como por ejemplo: la selección de interfaces.
 
-</Vitest> además de estar basado en *Vite* permitirá hacer testing compatible con los proyectos.
+Vitest además de estar basado en *Vite* permitirá hacer testing compatible con los proyectos.
+
+| Categoría             | Dependencias / herramientas | Propósito                                                                      |
+| --------------------- | --------------------------- | ------------------------------------------------------------------------------ |
+| Framework frontend    | Vue 3                       | Construcción de interfaz, pantallas y componentes del juego.                   |
+| Entorno de desarrollo | Vite                        | Ejecución y compilación rápida del proyecto.                                   |
+| Lenguaje              | TypeScript                  | Organización y tipado de datos del juego.                                      |
+| Estado global         | Pinia                       | Manejo de vida, inventario, pistas, eventos y progreso.                        |
+| Navegación            | Vue Router                  | Cambio entre pantallas del juego: inicio, gameplay, pausa, victoria y derrota. |
+| Testing               | Vitest y Vue Test Utils     | Pruebas unitarias y validación de componentes.                                 |
+| Calidad de código     | ESLint y Prettier           | Revisión, formato y consistencia del código.                                   |
+| Gestor de paquetes    | pnpm                        | Instalación y administración de dependencias.                                  |
+| Contenedores          | Docker                      | Ejecución del proyecto en un entorno controlado.                               |
+| Automatización        | GitHub Actions              | Pruebas y build automático del proyecto.                                       |
 
 # Organización de las carpetas
 
