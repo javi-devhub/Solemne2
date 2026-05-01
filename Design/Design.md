@@ -132,7 +132,8 @@ Flujo del juego.
 ├── tsconfig.json
 ├── README.md
 └── DESIGN.md
+```
 
 # Mockups.
 
-![Mockup inicio, inventario y posible screamer](https://lh3.googleusercontent.com/d/1lpNhaNeD--VDxzSkbIT0dzp3R81_CoCu)
+![Mockup inicio, inventario y posible screamer](https://lh3.googleusercontent.com/d/1eV0t0Bjh2wN9D6DtZhWSACHebE7WU1uP)
