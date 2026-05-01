@@ -45,7 +45,7 @@ Vitest además de estar basado en *Vite* permitirá hacer testing compatible con
 
 | Categoría             | Dependencias / herramientas | Propósito                                                                      |
 | --------------------- | --------------------------- | ------------------------------------------------------------------------------ |
-| Framework frontend    | Vue 3                       | Construcción de interfaz, pantallas y componentes del juego.                   |
+| Framework frontend    | Vue 3                       | permitirá organizar el proyecto mediante componentes reutilizables, manejar pantallas del juego y actualizar visualmente la interfaz cuando cambie el estado de los jugadores.                   |
 | Entorno de desarrollo | Vite                        | Ejecución y compilación rápida del proyecto.                                   |
 | Lenguaje              | TypeScript                  | Organización y tipado de datos del juego.                                      |
 | Estado global         | Pinia                       | Manejo de vida, inventario, pistas, eventos y progreso.                        |
