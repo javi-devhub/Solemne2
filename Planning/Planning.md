@@ -10,7 +10,7 @@
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
 | Lunes 27 de abril  | Definir la idea principal del juego, el contexto narrativo, el tipo de terror psicológico y la mecánica cooperativa base.                  | ✔    |
 | Martes 28 de abril | Establecer los requisitos del proyecto mediante MoSCoW, definiendo funcionalidades obligatorias, deseables, opcionales y fuera de alcance. | ✔      |
-| Jueves 30 de abril | Definir la tecnología a utilizar, la estructura general del proyecto, las pantallas principales y la organización inicial del repositorio. | ✔      |
+| Jueves 30 de abril | Definir la tecnología a utilizar, la estructura general del proyecto, mockup de las pantallas principales y además la organización inicial del repositorio. | ✔      |
 
 ---
 
