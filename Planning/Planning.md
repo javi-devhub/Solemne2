@@ -40,7 +40,7 @@
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------ |
 | Lunes 18 de mayo  | Implementar eventos de tensión, como screamer, glitch visual o aparición de la presencia, además de consecuencias por errores.            | ☐      |
 | Martes 19 de mayo | Realizar pruebas del flujo completo del juego, revisar errores, ajustar mecánicas y validar puzzles, inventario y visibilidad de objetos. | ☐      |
-
+| Jueves 21 de mayo | Realizar testeos generales del juego completo, revisando pantallas, movimiento, HUD, inventario, objetos inspeccionables, interacción, puzzles, eventos de tensión, visibilidad diferenciada entre jugadores y flujo general del prototipo. | ☐ |
 ---
 
 ## Semana 5: Revisión y entrega final
