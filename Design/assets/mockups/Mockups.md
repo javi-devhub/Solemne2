@@ -5,7 +5,6 @@ A continuación se presentan los recursos visuales en alta resolución para el d
 ---
 
 ## 1. Interfaz de Usuario (HUD)
-Información asimétrica para ambas jugadoras.
 
 <p align="center">
   <img src="https://drive.google.com/uc?export=view&id=1i99KEkhOfDBXS0hHF71LVsEW1tCvQ4s4" width="48%" alt="EJ HUD J1" />
