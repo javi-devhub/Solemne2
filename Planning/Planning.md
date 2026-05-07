@@ -19,8 +19,8 @@
 | Día               | Actividad planificada                                                                                                                           | Estado |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
 | Lunes 4 de mayo  | Diseñar la primera escena jugable, incluyendo ambiente, objetos inspeccionables, pistas y objetivo principal de la habitación.                  | ✔       |
-| Martes 5 de mayo | Diseñar los puzzles cooperativos principales, considerando percepción distinta entre jugadores, pistas compartidas y condiciones de resolución. | ☐      |
-| Jueves 7 de mayo | Elaborar mockups del HUD, panel de pistas y más eventos de tensión como glitches o screamers.                 | ☐      |
+| Martes 5 de mayo | Diseñar y realizar un brainstorming de posibles puzzles cooperativos, considerando percepción distinta entre jugadores, pistas compartidas y condiciones de resolución. | ✔      |
+| Jueves 7 de mayo | Elaborar mockups del HUD, panel de pistas y más eventos de tensión como glitches o screamers.                 | ✔      |
 
 ---
 
