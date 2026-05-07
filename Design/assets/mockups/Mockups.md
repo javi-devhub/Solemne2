@@ -39,7 +39,7 @@ A continuación se presentan los recursos visuales en alta resolución para el d
 
 ---
 
-## 3. Gestión de la Tensión ⚠️
+## 3. Gestión de la Tensión
 <p align="center">
   <img src="https://drive.google.com/uc?export=view&id=1_2OpBekYSWAktnSoTW__I8fbStl_Olal" width="85%" alt="Eventos de Tensión" />
 </p>
