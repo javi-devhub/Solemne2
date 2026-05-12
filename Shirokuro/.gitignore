@@ -1,0 +1,21 @@
+# Dependencias (Cualquier carpeta node_modules en este nivel)
+node_modules/
+.pnpm-debug.log*
+
+# Compilación
+dist/
+dist-ssr/
+*.local
+
+# Docker
+.dockerignore
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# IDEs y Sistema
+.vscode/
+.DS_Store
+thumbs.db
