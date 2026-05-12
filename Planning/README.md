@@ -28,7 +28,7 @@
 
 | Día               | Actividad planificada                                                                                                              | Estado |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| Lunes 11 de mayo  | Implementar y testear la base visual del juego, incluyendo pantalla de inicio, pantalla principal y estructura dividida para dos jugadores.  | ☐      |
+| Lunes 11 de mayo  | Implementar y testear la base visual del juego, incluyendo pantalla de inicio, pantalla principal y estructura dividida para dos jugadores.  |  ✔     |
 | Martes 12 de mayo | Implementar y testear elementos básicos de gameplay, como movimiento, HUD, inventario, objetos inspeccionables y mensajes de interacción.    | ☐      |
 | Jueves 14 de mayo | Integrar y testear la lógica cooperativa, incorporando pistas diferentes para cada jugador, condiciones de avance y primer puzzle funcional. | ☐      |
 
