@@ -6,6 +6,7 @@ import type { Item } from '@/types/item'
 const mockItem: Item = {
   id: 'key-001',
   name: 'Llave oxidada',
+  icon: '🗝️',
   description: 'Una llave vieja.',
   sprite: 'key',
   isUsable: true,

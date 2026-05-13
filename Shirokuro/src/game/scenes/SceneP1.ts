@@ -1,37 +1,50 @@
 import Phaser from 'phaser'
 import { Player } from '../objects/Player'
+import { ROOM_01_OBJECTS } from '../data/interactable'
+import { gameBus } from '@/composables/useGameEventBus'
 
-const WORLD_W = 1280
-const WORLD_H = 720
-const SPEED   = 180
+const WORLD_W  = 1280
+const WORLD_H  = 720
+const SPEED    = 180
+const FLOOR_Y  = WORLD_H * 0.72
+const INTERACT_DIST = 80
 
 export class SceneP1 extends Phaser.Scene {
+  private player!:  Player
+  private keyW!:    Phaser.Input.Keyboard.Key
+  private keyA!:    Phaser.Input.Keyboard.Key
+  private keyS!:    Phaser.Input.Keyboard.Key
+  private keyD!:    Phaser.Input.Keyboard.Key
+  private keyE!:    Phaser.Input.Keyboard.Key
 
-  private player!: Player
-  private keyW!: Phaser.Input.Keyboard.Key
-  private keyA!: Phaser.Input.Keyboard.Key
-  private keyS!: Phaser.Input.Keyboard.Key
-  private keyD!: Phaser.Input.Keyboard.Key
-  private keyE!: Phaser.Input.Keyboard.Key
-
-  constructor() {
-    super({ key: 'SceneP1' })
-  }
+  constructor() { super({ key: 'SceneP1' }) }
 
   create() {
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H)
-
     this.buildRoom()
 
-    this.player = new Player(this, 300, WORLD_H * 0.65, 1, WORLD_W, WORLD_H)
+    this.player = new Player(this, 300, FLOOR_Y - 40, 1, WORLD_W, WORLD_H)
 
-    // Viewport: mitad izquierda
+    const floor = this.physics.add.staticImage(WORLD_W / 2, FLOOR_Y + 4, '__DEFAULT')
+    floor.setDisplaySize(WORLD_W, 8).refreshBody().setAlpha(0)
+    this.physics.add.collider(this.player.body, floor)
+
+    const wallL = this.physics.add.staticImage(0, WORLD_H / 2, '__DEFAULT')
+    wallL.setDisplaySize(8, WORLD_H).refreshBody().setAlpha(0)
+    const wallR = this.physics.add.staticImage(WORLD_W, WORLD_H / 2, '__DEFAULT')
+    wallR.setDisplaySize(8, WORLD_H).refreshBody().setAlpha(0)
+    this.physics.add.collider(this.player.body, wallL)
+    this.physics.add.collider(this.player.body, wallR)
+
     this.cameras.main.setViewport(0, 0, 640, 720)
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H)
     this.cameras.main.setBackgroundColor('#060608')
     this.cameras.main.startFollow(this.player.body, true, 0.1, 0.1)
 
     this.setupInput()
+
+    // Tecla E — interactuar
+    this.keyE.on('down', () => this.tryInteract())
   }
 
   update() {
@@ -41,32 +54,93 @@ export class SceneP1 extends Phaser.Scene {
     if (this.keyW.isDown) vy = -SPEED
     if (this.keyS.isDown) vy =  SPEED
     this.player.move(vx, vy)
+
+    this.checkProximity()
+  }
+
+  private checkProximity() {
+    const { x, y } = this.player.getPosition()
+    let nearest: typeof ROOM_01_OBJECTS[0] | null = null
+    let minDist = INTERACT_DIST
+
+    for (const obj of ROOM_01_OBJECTS) {
+      const dist = Phaser.Math.Distance.Between(x, y, obj.x, obj.y)
+      if (dist < minDist) { minDist = dist; nearest = obj }
+    }
+
+    if (nearest) {
+      // Convertir coordenadas mundo → pantalla (mitad izquierda)
+      const cam   = this.cameras.main
+      const sx    = (nearest.x - cam.scrollX) * cam.zoom
+      const sy    = (nearest.y - cam.scrollY) * cam.zoom - 40
+
+      gameBus.emit('p1:proximity', {
+        objectId: nearest.id,
+        prompt:   nearest.promptP1,
+        screenX:  sx,
+        screenY:  sy,
+      })
+    } else {
+      gameBus.emit('p1:proximity', null)
+    }
+  }
+
+  private tryInteract() {
+    const { x, y } = this.player.getPosition()
+    for (const obj of ROOM_01_OBJECTS) {
+      const dist = Phaser.Math.Distance.Between(x, y, obj.x, obj.y)
+      if (dist < INTERACT_DIST) {
+        const cam  = this.cameras.main
+        const sx   = (obj.x - cam.scrollX) * cam.zoom
+        const sy   = (obj.y - cam.scrollY) * cam.zoom - 60
+
+        gameBus.emit('p1:interact', {
+          objectId:    obj.id,
+          description: obj.descriptionP1,
+          actions:     obj.actions ?? [],
+          screenX:     sx,
+          screenY:     sy,
+        })
+        return
+      }
+    }
   }
 
   private buildRoom() {
-    const floorY = WORLD_H * 0.72
-
     this.add.rectangle(0, 0, WORLD_W, WORLD_H, 0x060606).setOrigin(0, 0)
+    const floorY = FLOOR_Y
     this.add.rectangle(0, floorY, WORLD_W, WORLD_H - floorY, 0x0a0a0a).setOrigin(0, 0)
     this.add.line(0, 0, 0, floorY, WORLD_W, floorY, 0x1e1e1e).setLineWidth(1).setOrigin(0, 0)
-
-    // Paredes
     this.add.rectangle(0, 0, 4, WORLD_H, 0x1a1a1a).setOrigin(0, 0)
     this.add.rectangle(WORLD_W - 4, 0, 4, WORLD_H, 0x1a1a1a).setOrigin(0, 0)
 
-    // Nombre sala
-    this.add.text(WORLD_W / 2, 18, 'HABITACIÓN 01 — J1', {
-      fontFamily: 'Share Tech Mono',
-      fontSize: '10px',
-      color: '#222222',
-      letterSpacing: 5,
-    }).setOrigin(0.5, 0)
+    this.add.text(16, 18, 'HABITACIÓN 01', {
+      fontFamily: 'Share Tech Mono', fontSize: '10px',
+      color: '#1e1e1e', letterSpacing: 5,
+    }).setOrigin(0, 0).setScrollFactor(0).setDepth(1)
 
-    // Objetos
+    // Objeto central del puzzle — J1 lo ve como osito
+    this.addPuzzleObject(
+      ROOM_01_OBJECTS[0].x,
+      ROOM_01_OBJECTS[0].y,
+      '🧸', '#3a3030'
+    )
+
     this.addDoor(180, floorY)
     this.addDoor(WORLD_W - 180, floorY)
-    this.addObject(500, floorY - 20, 40, 40, 'CAJA A')
-    this.addObject(800, floorY - 20, 40, 40, 'CAJA B')
+  }
+
+  private addPuzzleObject(x: number, y: number, icon: string, color: string) {
+    // Círculo de interacción (radio visual)
+    const g = this.add.graphics()
+    g.lineStyle(1, 0x2a2020, 0.4)
+    g.strokeCircle(x, y, INTERACT_DIST)
+
+    // Placeholder visual del objeto
+    this.add.rectangle(x, y, 48, 48, 0x1a1010)
+      .setStrokeStyle(1, 0x2e2020).setDepth(5)
+    this.add.text(x, y, icon, { fontSize: '24px' })
+      .setOrigin(0.5).setDepth(6)
   }
 
   private addDoor(x: number, floorY: number) {
@@ -76,15 +150,8 @@ export class SceneP1 extends Phaser.Scene {
     this.add.rectangle(x, floorY - dh + 20, 16, 16, 0x040404).setStrokeStyle(1, 0x181818)
   }
 
-  private addObject(x: number, y: number, w: number, h: number, label: string) {
-    this.add.rectangle(x, y, w, h, 0x111111).setStrokeStyle(1, 0x252525).setDepth(5)
-    this.add.text(x, y - h / 2 - 6, label, {
-      fontFamily: 'Share Tech Mono', fontSize: '7px', color: '#2a2a2a',
-    }).setOrigin(0.5, 1).setDepth(6)
-  }
-
   private setupInput() {
-    const kb = this.input.keyboard!
+    const kb  = this.input.keyboard!
     this.keyW = kb.addKey(Phaser.Input.Keyboard.KeyCodes.W)
     this.keyA = kb.addKey(Phaser.Input.Keyboard.KeyCodes.A)
     this.keyS = kb.addKey(Phaser.Input.Keyboard.KeyCodes.S)
