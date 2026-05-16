@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import { Player } from '../objects/Player'
 import { ROOM_01_OBJECTS } from '../data/interactable'
 import { gameBus } from '@/composables/useGameEventBus'
+import { puzzle1State } from '../state/puzzle1State'
 
 const WORLD_W       = 1280
 const WORLD_H       = 720
@@ -13,6 +14,14 @@ export class SceneP2 extends Phaser.Scene {
   private player!:    Player
   private cursors!:   Phaser.Types.Input.Keyboard.CursorKeys
   private keyEnter!:  Phaser.Input.Keyboard.Key
+  private keyBackspace!: Phaser.Input.Keyboard.Key
+
+  private devicePanel!: Phaser.GameObjects.Container
+  private devicePanelText!: Phaser.GameObjects.Text
+  private isDevicePanelOpen = false
+
+  private inspectText!: Phaser.GameObjects.Text
+  private inspectTextTimer?: Phaser.Time.TimerEvent
 
   constructor() { super({ key: 'SceneP2' }) }
 
@@ -40,18 +49,50 @@ export class SceneP2 extends Phaser.Scene {
 
     this.setupInput()
 
+    this.inspectText = this.add.text(320, 620, '', {
+    fontFamily: 'Share Tech Mono',
+    fontSize: '14px',
+    color: '#dddddd',
+    backgroundColor: '#000000',
+    padding: {
+      x: 12,
+      y: 8,
+  },
+})
+  .setOrigin(0.5)
+  .setScrollFactor(0)
+  .setDepth(999)
+  .setVisible(false)
+    this.createDevicePanel()
     this.keyEnter.on('down', () => this.tryInteract())
   }
 
   update() {
+
+    if (this.isDevicePanelOpen) {
+    if (Phaser.Input.Keyboard.JustDown(this.keyEnter)) {
+      this.refreshDevicePanel()
+    }
+
+    if (Phaser.Input.Keyboard.JustDown(this.keyBackspace)) {
+      this.closeDevicePanel()
+    }
+
+    this.player.move(0)
+    this.player.updateLabel()
+    return
+  }
     let vx = 0, vy = 0
     if (this.cursors.left.isDown)  vx = -SPEED
     if (this.cursors.right.isDown) vx =  SPEED
-    if (this.cursors.up.isDown)    vy = -SPEED
-    if (this.cursors.down.isDown)  vy =  SPEED
-    this.player.move(vx, vy)
+    this.player.move(vx)
 
-    this.checkProximity()
+    if (Phaser.Input.Keyboard.JustDown(this.cursors.up!)) {
+  }
+
+  this.player.updateLabel()
+
+  this.checkProximity()
   }
 
   private checkProximity() {
@@ -89,6 +130,11 @@ export class SceneP2 extends Phaser.Scene {
         const sx  = 640 + (obj.x - cam.scrollX) * cam.zoom
         const sy  = (obj.y - cam.scrollY) * cam.zoom - 60
 
+        console.log('J2 inspeccionó:', obj.descriptionP2)
+        this.showInspectMessage(obj.descriptionP2)
+        this.openDevicePanel()
+        
+
         gameBus.emit('p2:interact', {
           objectId:    obj.id,
           description: obj.descriptionP2,
@@ -100,6 +146,102 @@ export class SceneP2 extends Phaser.Scene {
       }
     }
   }
+
+  private showInspectMessage(message: string) {
+    this.inspectText.setText(message)
+    this.inspectText.setVisible(true)
+
+    if (this.inspectTextTimer) {
+    this.inspectTextTimer.remove(false)
+    }
+
+    this.inspectTextTimer = this.time.delayedCall(3000, () => {
+    this.inspectText.setVisible(false)
+  })
+}
+
+
+private createDevicePanel() {
+  const panelBg = this.add.rectangle(320, 260, 420, 260, 0x050505, 0.95)
+    .setStrokeStyle(1, 0x334455)
+
+  this.devicePanelText = this.add.text(320, 260, '', {
+    fontFamily: 'Share Tech Mono',
+    fontSize: '14px',
+    color: '#dddddd',
+    align: 'left',
+    wordWrap: {
+      width: 360,
+    },
+  }).setOrigin(0.5)
+
+  this.devicePanel = this.add.container(0, 0, [
+    panelBg,
+    this.devicePanelText,
+  ])
+
+  this.devicePanel
+    .setScrollFactor(0)
+    .setDepth(1000)
+    .setVisible(false)
+}
+
+private openDevicePanel() {
+  this.isDevicePanelOpen = true
+  this.refreshDevicePanel()
+  this.devicePanel.setVisible(true)
+}
+
+private refreshDevicePanel() {
+  const status = puzzle1State.getDeviceStatus()
+
+
+   if (puzzle1State.solved) {
+    this.devicePanelText.setText(
+      [
+        '[ DISPOSITIVO MÉDICO ]',
+        '',
+        'La pantalla dejó de parpadear.',
+        'La línea de vitalidad se mantiene estable.',
+        '',
+        'Estado actual:',
+        status,
+        '',
+        'Sistema sincronizado.',
+        'La puerta parece haberse desbloqueado.',
+        '',
+        'Backspace: cerrar',
+      ].join('\n'),
+    )
+    return
+  }
+
+  this.devicePanelText.setText(
+    [
+      '[ DISPOSITIVO MÉDICO ]',
+    '',
+    'La pantalla parpadea con una señal irregular.',
+    'Cada ajuste del otro jugador altera la lectura.',
+    '',
+    'Pista:',
+    'La señal tiene tres zonas alteradas.',
+    'Cada cambio correcto estabiliza una zona.',
+    'Si el orden falla, la lectura vuelve al inicio.',
+    '',
+    'Estado actual:',
+    status,
+    '',
+    'ENTER: actualizar lectura',
+    'BACKSPACE: cerrar',
+    ].join('\n'),
+  )
+}
+
+private closeDevicePanel() {
+  this.isDevicePanelOpen = false
+  this.devicePanel.setVisible(false)
+}
+
 
   private buildRoom() {
     this.add.rectangle(0, 0, WORLD_W, WORLD_H, 0x060606).setOrigin(0, 0)
@@ -147,5 +289,6 @@ export class SceneP2 extends Phaser.Scene {
     const kb      = this.input.keyboard!
     this.cursors  = kb.createCursorKeys()
     this.keyEnter = kb.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
+    this.keyBackspace = kb.addKey(Phaser.Input.Keyboard.KeyCodes.BACKSPACE)
   }
 }

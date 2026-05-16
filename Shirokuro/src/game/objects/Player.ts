@@ -22,6 +22,7 @@ export class Player {
     this.worldW   = worldW
     this.worldH   = worldH
 
+
     // Physics image con textura generada por código
     const key = `player_rect_${playerId}`
     if (!scene.textures.exists(key)) {
@@ -37,6 +38,15 @@ export class Player {
     this.body.setDepth(10)
     this.body.setImmovable(false)
 
+    // IMPORTANTE: gravedad del jugador
+    this.body.setGravityY(900)
+
+    // Para que el jugador no rebote raro
+    this.body.setBounce(0)
+
+    // Ajuste del cuerpo físico
+    this.body.setSize(20, 32)
+
     this.label = scene.add.text(x, y - 24, `J${playerId}`, {
       fontFamily: 'Share Tech Mono',
       fontSize:   '9px',
@@ -44,9 +54,24 @@ export class Player {
     }).setOrigin(0.5, 1).setDepth(11)
   }
 
-  move(vx: number, vy: number) {
-    this.body.setVelocity(vx, vy)
+  move(vx: number) {
+    // Solo mueve en horizontal.
+    // No tocamos la velocidad Y para no hacer que flote.
+    this.body.setVelocityX(vx)
 
+    this.updateLabel()
+  }
+
+  jump() {
+    const arcadeBody = this.body.body as Phaser.Physics.Arcade.Body
+
+    // Solo puede saltar si está tocando el piso
+    if (arcadeBody.blocked.down) {
+      this.body.setVelocityY(-420)
+    }
+  }
+
+  updateLabel() {
     this.label.x = this.body.x
     this.label.y = this.body.y - 24
   }

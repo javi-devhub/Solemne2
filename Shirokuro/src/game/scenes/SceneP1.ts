@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import { Player } from '../objects/Player'
 import { ROOM_01_OBJECTS } from '../data/interactable'
 import { gameBus } from '@/composables/useGameEventBus'
+import { puzzle1State, type TeddyPart } from '../state/puzzle1State'
 
 const WORLD_W  = 1280
 const WORLD_H  = 720
@@ -16,6 +17,17 @@ export class SceneP1 extends Phaser.Scene {
   private keyS!:    Phaser.Input.Keyboard.Key
   private keyD!:    Phaser.Input.Keyboard.Key
   private keyE!:    Phaser.Input.Keyboard.Key
+  private keyQ!:    Phaser.Input.Keyboard.Key
+
+  private inspectText!: Phaser.GameObjects.Text
+  private inspectTextTimer?: Phaser.Time.TimerEvent
+
+  private teddyPanel!: Phaser.GameObjects.Container
+  private teddyPanelText!: Phaser.GameObjects.Text
+  private teddySelectedIndex = 0
+  private teddyParts: TeddyPart[] = ['oreja', 'nariz', 'brazo']
+  private isPuzzlePanelOpen = false
+  private solvedMessageShown = false
 
   constructor() { super({ key: 'SceneP1' }) }
 
@@ -43,20 +55,48 @@ export class SceneP1 extends Phaser.Scene {
 
     this.setupInput()
 
+    this.inspectText = this.add.text(320, 620, '', {
+    fontFamily: 'Share Tech Mono',
+    fontSize: '14px',
+    color: '#dddddd',
+   backgroundColor: '#000000',
+    padding: {
+      x: 12,
+      y: 8,
+  },
+})
+  .setOrigin(0.5)
+  .setScrollFactor(0)
+  .setDepth(999)
+  .setVisible(false)
+
+  this.createTeddyPanel()
+
     // Tecla E — interactuar
-    this.keyE.on('down', () => this.tryInteract())
-  }
+  this.keyE.on('down', () => this.tryInteract())
+ }
 
   update() {
-    let vx = 0, vy = 0
+
+    if (this.isPuzzlePanelOpen) {
+    this.handleTeddyPanelInput()
+    this.player.move(0)
+    this.player.updateLabel()
+    return
+  }
+    let vx = 0
     if (this.keyA.isDown) vx = -SPEED
     if (this.keyD.isDown) vx =  SPEED
-    if (this.keyW.isDown) vy = -SPEED
-    if (this.keyS.isDown) vy =  SPEED
-    this.player.move(vx, vy)
+    this.player.move(vx)
+
+    if (Phaser.Input.Keyboard.JustDown(this.keyW)) {
+    
+  }
+
+    this.player.updateLabel()
 
     this.checkProximity()
-  }
+}
 
   private checkProximity() {
     const { x, y } = this.player.getPosition()
@@ -94,6 +134,10 @@ export class SceneP1 extends Phaser.Scene {
         const sx   = (obj.x - cam.scrollX) * cam.zoom
         const sy   = (obj.y - cam.scrollY) * cam.zoom - 60
 
+        console.log('J1 inspeccionó:', obj.descriptionP1)
+        this.showInspectMessage(obj.descriptionP1)
+        this.openTeddyPanel()
+
         gameBus.emit('p1:interact', {
           objectId:    obj.id,
           description: obj.descriptionP1,
@@ -105,6 +149,138 @@ export class SceneP1 extends Phaser.Scene {
       }
     }
   }
+  private showInspectMessage(message: string) {
+    this.inspectText.setText(message)
+    this.inspectText.setVisible(true)
+
+    if (this.inspectTextTimer) {
+    this.inspectTextTimer.remove(false)
+  }
+
+  this.inspectTextTimer = this.time.delayedCall(3000, () => {
+    this.inspectText.setVisible(false)
+  })
+
+}
+  private createTeddyPanel() {
+  const panelBg = this.add.rectangle(320, 260, 420, 260, 0x050505, 0.95)
+    .setStrokeStyle(1, 0x444444)
+
+  this.teddyPanelText = this.add.text(320, 260, '', {
+    fontFamily: 'Share Tech Mono',
+    fontSize: '14px',
+    color: '#dddddd',
+    align: 'left',
+    wordWrap: {
+      width: 360,
+    },
+  }).setOrigin(0.5)
+
+  this.teddyPanel = this.add.container(0, 0, [
+    panelBg,
+    this.teddyPanelText,
+  ])
+
+  this.teddyPanel
+    .setScrollFactor(0)
+    .setDepth(1000)
+    .setVisible(false)
+}
+
+private openTeddyPanel() {
+  this.isPuzzlePanelOpen = true
+  this.refreshTeddyPanel()
+  this.teddyPanel.setVisible(true)
+}
+
+private refreshTeddyPanel() {
+  const selectedPart = this.teddyParts[this.teddySelectedIndex]
+
+   if (puzzle1State.solved) {
+    this.teddyPanelText.setText(
+      [
+        '[ OSITO COSIDO ]',
+        '',
+        'El osito dejó de temblar.',
+        'Las costuras parecen haberse acomodado.',
+        '',
+        'Estado: SINCRONIZADO',
+        '',
+        'Se escuchó un clic metálico a lo lejos.',
+        'La puerta parece haberse desbloqueado.',
+        '',
+        'Q: cerrar',
+      ].join('\n'),
+    )
+    return
+  }
+
+  this.teddyPanelText.setText(
+    [
+
+      '[ OSITO COSIDO ]',
+    '',
+    'El osito tiene partes sueltas.',
+    'Algunas reaccionan con pequeños parpadeos.',
+    '',
+    'Pista:',
+    'La oreja parece responder primero.',
+    'La nariz vibra después.',
+    'El brazo se mueve al final.',
+    '',
+    `Parte seleccionada: ${selectedPart.toUpperCase()}`,
+    '',
+    'A / D: cambiar parte',
+    'E: girar parte',
+    'Q: cerrar',
+    ].join('\n'),
+  )
+}
+
+private handleTeddyPanelInput() {
+  if (Phaser.Input.Keyboard.JustDown(this.keyA)) {
+    this.teddySelectedIndex--
+
+    if (this.teddySelectedIndex < 0) {
+      this.teddySelectedIndex = this.teddyParts.length - 1
+    }
+
+    this.refreshTeddyPanel()
+  }
+
+  if (Phaser.Input.Keyboard.JustDown(this.keyD)) {
+    this.teddySelectedIndex++
+
+    if (this.teddySelectedIndex >= this.teddyParts.length) {
+      this.teddySelectedIndex = 0
+    }
+
+    this.refreshTeddyPanel()
+  }
+
+  if (Phaser.Input.Keyboard.JustDown(this.keyE)) {
+    const selectedPart = this.teddyParts[this.teddySelectedIndex]
+    const result = puzzle1State.rotatePart(selectedPart)
+
+    this.showInspectMessage(result.messageP1)
+    this.refreshTeddyPanel()
+  }
+
+  if (puzzle1State.solved && !this.solvedMessageShown) {
+    this.solvedMessageShown = true
+    this.showInspectMessage('Se escuchó un clic metálico. La puerta se desbloqueó.')
+  }
+
+
+  if (Phaser.Input.Keyboard.JustDown(this.keyQ)){
+    this.closeTeddyPanel()
+  }
+}
+
+  private closeTeddyPanel() {
+    this.isPuzzlePanelOpen = false
+    this.teddyPanel.setVisible(false)
+}
 
   private buildRoom() {
     this.add.rectangle(0, 0, WORLD_W, WORLD_H, 0x060606).setOrigin(0, 0)
@@ -157,5 +333,6 @@ export class SceneP1 extends Phaser.Scene {
     this.keyS = kb.addKey(Phaser.Input.Keyboard.KeyCodes.S)
     this.keyD = kb.addKey(Phaser.Input.Keyboard.KeyCodes.D)
     this.keyE = kb.addKey(Phaser.Input.Keyboard.KeyCodes.E)
+    this.keyQ= kb.addKey(Phaser.Input.Keyboard.KeyCodes.Q)
   }
 }
