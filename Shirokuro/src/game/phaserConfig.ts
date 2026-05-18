@@ -2,6 +2,7 @@ import { PreloadScene } from './scenes/PreloadScene';
 import { SceneP1 } from './scenes/SceneP1';
 import { SceneP2 } from './scenes/SceneP2';
 import { HUDScene } from './scenes/HUDScene';
+import { MainMenuScene } from './scenes/MainMenuScene';
 
 export function createPhaserConfig(parent: HTMLElement): Phaser.Types.Core.GameConfig {
   return {
@@ -24,6 +25,6 @@ export function createPhaserConfig(parent: HTMLElement): Phaser.Types.Core.GameC
         debug: false,
       },
     },
-    scene: [PreloadScene, SceneP1, SceneP2, HUDScene],
+    scene: [PreloadScene, MainMenuScene, SceneP1, SceneP2, HUDScene],
   }
 }

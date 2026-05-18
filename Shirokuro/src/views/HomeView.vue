@@ -149,7 +149,11 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #080808;
+  background-image: url('/assets/backgrounds/main-menu.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
   overflow: hidden;
 }
 
