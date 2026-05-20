@@ -33,7 +33,7 @@ export class SceneP1 extends Phaser.Scene {
   constructor() { super({ key: 'SceneP1' }) }
 
   preload() {
-    this.load.image('bg-stage1', '/assets/backgrounds/scene1-pj11.png');
+    this.load.image('bg-stage1', '/assets/backgrounds/scene1-pj1.png');
   }
 
   create() {

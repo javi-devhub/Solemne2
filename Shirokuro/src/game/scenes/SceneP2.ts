@@ -12,6 +12,7 @@ const INTERACT_DIST = 80
 
 export class SceneP2 extends Phaser.Scene {
   private player!:    Player
+  private background!: Phaser.GameObjects.Image;
   private cursors!:   Phaser.Types.Input.Keyboard.CursorKeys
   private keyEnter!:  Phaser.Input.Keyboard.Key
   private keyBackspace!: Phaser.Input.Keyboard.Key
@@ -25,9 +26,17 @@ export class SceneP2 extends Phaser.Scene {
 
   constructor() { super({ key: 'SceneP2' }) }
 
+  preload() {
+    this.load.image('bg-stage1-j2', '/assets/backgrounds/scene1-pj2.png');
+  }
+
   create() {
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H)
     this.buildRoom()
+
+    this.background = this.add.image(640, 360, 'bg-stage1-j2');
+    this.background.texture.setFilter(Phaser.Textures.FilterMode.NEAREST); // Pixel Art impecable
+    this.background.setDepth(-1); // Detrás de jugadores y paneles
 
     this.player = new Player(this, WORLD_W - 300, FLOOR_Y - 40, 2, WORLD_W, WORLD_H)
 
@@ -244,10 +253,10 @@ private closeDevicePanel() {
 
 
   private buildRoom() {
-    this.add.rectangle(0, 0, WORLD_W, WORLD_H, 0x060606).setOrigin(0, 0)
+    //this.add.rectangle(0, 0, WORLD_W, WORLD_H, 0x060606).setOrigin(0, 0)
     const floorY = FLOOR_Y
-    this.add.rectangle(0, floorY, WORLD_W, WORLD_H - floorY, 0x0a0a0a).setOrigin(0, 0)
-    this.add.line(0, 0, 0, floorY, WORLD_W, floorY, 0x1e1e1e).setLineWidth(1).setOrigin(0, 0)
+    //this.add.rectangle(0, floorY, WORLD_W, WORLD_H - floorY, 0x0a0a0a).setOrigin(0, 0)
+    //this.add.line(0, 0, 0, floorY, WORLD_W, floorY, 0x1e1e1e).setLineWidth(1).setOrigin(0, 0)
     this.add.rectangle(0, 0, 4, WORLD_H, 0x1a1a1a).setOrigin(0, 0)
     this.add.rectangle(WORLD_W - 4, 0, 4, WORLD_H, 0x1a1a1a).setOrigin(0, 0)
 
