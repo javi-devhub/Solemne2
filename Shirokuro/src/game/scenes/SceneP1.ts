@@ -22,6 +22,7 @@ export class SceneP1 extends Phaser.Scene {
 
   private inspectText!: Phaser.GameObjects.Text
   private inspectTextTimer?: Phaser.Time.TimerEvent
+  private wallColliders!: Phaser.Physics.Arcade.StaticGroup
 
   private teddyPanel!: Phaser.GameObjects.Container
   private teddyPanelText!: Phaser.GameObjects.Text
@@ -45,10 +46,11 @@ export class SceneP1 extends Phaser.Scene {
     this.background.setDepth(-1); // Se dibuja detrás de todo
 
     this.player = new Player(this, 300, FLOOR_Y - 40, 1, WORLD_W, WORLD_H)
+    this.createWallColliders()
 
-    const floor = this.physics.add.staticImage(WORLD_W / 2, FLOOR_Y + 4, '__DEFAULT')
-    floor.setDisplaySize(WORLD_W, 8).refreshBody().setAlpha(0)
-    this.physics.add.collider(this.player.body, floor)
+    //const floor = this.physics.add.staticImage(WORLD_W / 2, FLOOR_Y + 4, '__DEFAULT')
+    //floor.setDisplaySize(WORLD_W, 8).refreshBody().setAlpha(0)
+    //this.physics.add.collider(this.player.body, floor)
 
     const wallL = this.physics.add.staticImage(0, WORLD_H / 2, '__DEFAULT')
     wallL.setDisplaySize(8, WORLD_H).refreshBody().setAlpha(0)
@@ -89,14 +91,17 @@ export class SceneP1 extends Phaser.Scene {
 
     if (this.isPuzzlePanelOpen) {
     this.handleTeddyPanelInput()
-    this.player.move(0)
+    this.player.moveFree(0, 0)
     this.player.updateLabel()
     return
   }
     let vx = 0
+    let vy = 0
     if (this.keyA.isDown) vx = -SPEED
     if (this.keyD.isDown) vx =  SPEED
-    this.player.move(vx)
+    if (this.keyW.isDown) vy = -SPEED
+    if (this.keyS.isDown) vy = SPEED
+    this.player.moveFree(vx, vy)
 
     if (Phaser.Input.Keyboard.JustDown(this.keyW)) {
     
@@ -343,5 +348,51 @@ private handleTeddyPanelInput() {
     this.keyD = kb.addKey(Phaser.Input.Keyboard.KeyCodes.D)
     this.keyE = kb.addKey(Phaser.Input.Keyboard.KeyCodes.E)
     this.keyQ= kb.addKey(Phaser.Input.Keyboard.KeyCodes.Q)
+  }
+
+  private createWallColliders() {
+  this.wallColliders = this.physics.add.staticGroup()
+
+    const thickness = 24
+
+    const LEFT = 250
+    const RIGHT = 1020
+    const TOP = 215
+    const BOTTOM = 645
+
+    const centerX = (LEFT + RIGHT) / 2
+    const centerY = (TOP + BOTTOM) / 2
+    const width = RIGHT - LEFT
+    const height = BOTTOM - TOP
+
+  // Pared superior
+  this.wallColliders
+    .create(centerX, TOP, '__DEFAULT')
+    .setDisplaySize(width, thickness)
+    .setAlpha(0.3)
+    .refreshBody()
+
+  // Pared inferior
+  this.wallColliders
+    .create(centerX, BOTTOM, '__DEFAULT')
+    .setDisplaySize(width, thickness)
+    .setAlpha(0.3)
+    .refreshBody()
+
+  // Pared izquierda
+  this.wallColliders
+    .create(LEFT, centerY, '__DEFAULT')
+    .setDisplaySize(thickness, height)
+    .setAlpha(0.3)
+    .refreshBody()
+
+  // Pared derecha
+  this.wallColliders
+    .create(RIGHT, centerY, '__DEFAULT')
+    .setDisplaySize(thickness, height)
+    .setAlpha(0.3)
+    .refreshBody()
+
+  this.physics.add.collider(this.player.body, this.wallColliders)
   }
 }

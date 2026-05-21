@@ -39,8 +39,9 @@ export class Player {
     this.body.setImmovable(false)
 
     // IMPORTANTE: gravedad del jugador
-    this.body.setGravityY(900)
-
+    this.body.setGravityY(0)
+    const arcadeBody = this.body.body as Phaser.Physics.Arcade.Body
+    this.body.body.allowGravity = false
     // Para que el jugador no rebote raro
     this.body.setBounce(0)
 
@@ -60,6 +61,11 @@ export class Player {
     this.body.setVelocityX(vx)
 
     this.updateLabel()
+  }
+
+  moveFree(vx: number, vy: number) {
+  this.body.setVelocity(vx, vy)
+  this.updateLabel()
   }
 
   jump() {
