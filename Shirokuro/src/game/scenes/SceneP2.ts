@@ -12,9 +12,11 @@ const INTERACT_DIST = 80
 
 export class SceneP2 extends Phaser.Scene {
   private player!:    Player
+  private background!: Phaser.GameObjects.Image;
   private cursors!:   Phaser.Types.Input.Keyboard.CursorKeys
   private keyEnter!:  Phaser.Input.Keyboard.Key
   private keyBackspace!: Phaser.Input.Keyboard.Key
+  private wallColliders!: Phaser.Physics.Arcade.StaticGroup
 
   private devicePanel!: Phaser.GameObjects.Container
   private devicePanelText!: Phaser.GameObjects.Text
@@ -25,15 +27,23 @@ export class SceneP2 extends Phaser.Scene {
 
   constructor() { super({ key: 'SceneP2' }) }
 
+  preload() {
+    this.load.image('bg-stage1-j2', '/assets/backgrounds/scene1-pj2.png');
+  }
+
   create() {
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H)
     this.buildRoom()
 
-    this.player = new Player(this, WORLD_W - 300, FLOOR_Y - 40, 2, WORLD_W, WORLD_H)
+    this.background = this.add.image(640, 360, 'bg-stage1-j2');
+    this.background.texture.setFilter(Phaser.Textures.FilterMode.NEAREST); // Pixel Art impecable
+    this.background.setDepth(-1); // Detrás de jugadores y paneles
 
-    const floor = this.physics.add.staticImage(WORLD_W / 2, FLOOR_Y + 4, '__DEFAULT')
-    floor.setDisplaySize(WORLD_W, 8).refreshBody().setAlpha(0)
-    this.physics.add.collider(this.player.body, floor)
+    this.player = new Player(this, 520, 530, 2, WORLD_W, WORLD_H)
+
+    //const floor = this.physics.add.staticImage(WORLD_W / 2, FLOOR_Y + 4, '__DEFAULT')
+    //floor.setDisplaySize(WORLD_W, 8).refreshBody().setAlpha(0)
+    //this.physics.add.collider(this.player.body, floor)
 
     const wallL = this.physics.add.staticImage(0, WORLD_H / 2, '__DEFAULT')
     wallL.setDisplaySize(8, WORLD_H).refreshBody().setAlpha(0)
@@ -41,6 +51,7 @@ export class SceneP2 extends Phaser.Scene {
     wallR.setDisplaySize(8, WORLD_H).refreshBody().setAlpha(0)
     this.physics.add.collider(this.player.body, wallL)
     this.physics.add.collider(this.player.body, wallR)
+    this.createWallColliders()
 
     this.cameras.main.setViewport(640, 0, 640, 720)
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H)
@@ -78,14 +89,17 @@ export class SceneP2 extends Phaser.Scene {
       this.closeDevicePanel()
     }
 
-    this.player.move(0)
+    this.player.moveFree(0, 0)
     this.player.updateLabel()
     return
   }
-    let vx = 0, vy = 0
+    let vx = 0 
+    let vy = 0
     if (this.cursors.left.isDown)  vx = -SPEED
     if (this.cursors.right.isDown) vx =  SPEED
-    this.player.move(vx)
+    if (this.cursors.up.isDown) vy = -SPEED
+    if (this.cursors.down.isDown) vy = SPEED
+    this.player.moveFree(vx, vy)
 
     if (Phaser.Input.Keyboard.JustDown(this.cursors.up!)) {
   }
@@ -244,10 +258,10 @@ private closeDevicePanel() {
 
 
   private buildRoom() {
-    this.add.rectangle(0, 0, WORLD_W, WORLD_H, 0x060606).setOrigin(0, 0)
+    //this.add.rectangle(0, 0, WORLD_W, WORLD_H, 0x060606).setOrigin(0, 0)
     const floorY = FLOOR_Y
-    this.add.rectangle(0, floorY, WORLD_W, WORLD_H - floorY, 0x0a0a0a).setOrigin(0, 0)
-    this.add.line(0, 0, 0, floorY, WORLD_W, floorY, 0x1e1e1e).setLineWidth(1).setOrigin(0, 0)
+    //this.add.rectangle(0, floorY, WORLD_W, WORLD_H - floorY, 0x0a0a0a).setOrigin(0, 0)
+    //this.add.line(0, 0, 0, floorY, WORLD_W, floorY, 0x1e1e1e).setLineWidth(1).setOrigin(0, 0)
     this.add.rectangle(0, 0, 4, WORLD_H, 0x1a1a1a).setOrigin(0, 0)
     this.add.rectangle(WORLD_W - 4, 0, 4, WORLD_H, 0x1a1a1a).setOrigin(0, 0)
 
@@ -291,4 +305,49 @@ private closeDevicePanel() {
     this.keyEnter = kb.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
     this.keyBackspace = kb.addKey(Phaser.Input.Keyboard.KeyCodes.BACKSPACE)
   }
+  private createWallColliders() {
+    this.wallColliders = this.physics.add.staticGroup()
+
+    const thickness = 24
+
+    const LEFT = 250
+    const RIGHT = 920
+    const TOP = 205
+    const BOTTOM = 645
+
+    const centerX = (LEFT + RIGHT) / 2
+    const centerY = (TOP + BOTTOM) / 2
+    const width = RIGHT - LEFT
+    const height = BOTTOM - TOP
+
+  // Pared superior
+    this.wallColliders
+    .create(centerX, TOP, '__DEFAULT')
+    .setDisplaySize(width, thickness)
+    .setAlpha(0.3)
+    .refreshBody()
+
+  // Pared inferior
+    this.wallColliders
+    .create(centerX, BOTTOM, '__DEFAULT')
+    .setDisplaySize(width, thickness)
+    .setAlpha(0.3)
+    .refreshBody()
+
+  // Pared izquierda
+    this.wallColliders
+    .create(LEFT, centerY, '__DEFAULT')
+    .setDisplaySize(thickness, height)
+    .setAlpha(0.3)
+    .refreshBody()
+
+  // Pared derecha
+    this.wallColliders
+    .create(RIGHT, centerY, '__DEFAULT')
+    .setDisplaySize(thickness, height)
+    .setAlpha(0.3)
+    .refreshBody()
+
+    this.physics.add.collider(this.player.body, this.wallColliders)
+}
 }
