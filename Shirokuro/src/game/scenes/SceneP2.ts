@@ -27,9 +27,6 @@ export class SceneP2 extends Phaser.Scene {
 
   constructor() { super({ key: 'SceneP2' }) }
 
-  preload() {
-    this.load.image('bg-stage1-j2', '/assets/backgrounds/scene1-pj2.png');
-  }
 
   create() {
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H)

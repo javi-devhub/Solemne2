@@ -3,6 +3,7 @@ import { Player } from '../objects/Player'
 import { ROOM_01_OBJECTS } from '../data/interactable'
 import { gameBus } from '@/composables/useGameEventBus'
 import { puzzle1State, type TeddyPart } from '../state/puzzle1State'
+import { Door } from '../objects/Door' // Ajusta la ruta de carpetas si es necesario
 
 const WORLD_W  = 1280
 const WORLD_H  = 720
@@ -31,11 +32,15 @@ export class SceneP1 extends Phaser.Scene {
   private isPuzzlePanelOpen = false
   private solvedMessageShown = false
 
+  private door!: Door
+
   constructor() { super({ key: 'SceneP1' }) }
 
   preload() {
-    this.load.image('bg-stage1', '/assets/backgrounds/scene1-pj1.png');
+
+  this.load.image('door-closed', '/assets/backgrounds/sprites/door-closed.png')
   }
+
 
   create() {
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H)
@@ -47,6 +52,16 @@ export class SceneP1 extends Phaser.Scene {
 
     this.player = new Player(this, 300, FLOOR_Y - 40, 1, WORLD_W, WORLD_H)
     this.createWallColliders()
+
+    this.door = new Door(this, 570, 150, 'door-closed')
+    this.physics.add.collider(this.player.body, this.door.sprite)
+
+    const doorObstacle = this.physics.add.staticImage(640, 135, '') // Sin textura (invisible)
+    doorObstacle.setSize(200, 30) // Mide exactamente el ancho de la puerta, y solo 15px de alto
+    doorObstacle.refreshBody()
+    doorObstacle.setVisible(false) // Lo hacemos completamente invisible
+
+    this.physics.add.collider(this.player.body, doorObstacle)
 
     //const floor = this.physics.add.staticImage(WORLD_W / 2, FLOOR_Y + 4, '__DEFAULT')
     //floor.setDisplaySize(WORLD_W, 8).refreshBody().setAlpha(0)

@@ -22,64 +22,66 @@ export class Player {
     this.worldW   = worldW
     this.worldH   = worldH
 
+    // Buscamos las llaves cortas 'player1' y 'player2'
+    const key = `player${playerId}`
 
-    // Physics image con textura generada por código
-    const key = `player_rect_${playerId}`
-    if (!scene.textures.exists(key)) {
-      const g = scene.add.graphics().setVisible(false);
-      g.fillStyle(playerId === 1 ? 0x999999 : 0x666666)
-      g.fillRect(0, 0, 20, 32)
-      g.generateTexture(key, 20, 32)
-      g.destroy()
+    // Creamos el cuerpo físico
+    this.body = scene.physics.add.image(x, y, key)
+    
+    // ── ¡LA CLAVE ESTÁ AQUÍ! ───────────────────────────────────────────
+    // Forzamos a la imagen gigante a medir 48px de ancho y 80px de alto.
+    // Si encuentras que se ve muy flaco o gordo, puedes cambiar estos números.
+   if (playerId === 1) {
+      // (J1)
+      this.body.setDisplaySize(300, 190)
+    } else {
+      // La niña con coletas (J2) - La empequeñecemos para concordar
+      this.body.setDisplaySize(210, 140) // Subimos un poco el alto para no deformar
     }
 
-    this.body = scene.physics.add.image(x, y, key)
-    this.body.setCollideWorldBounds(true)
-    this.body.setDepth(10)
-    this.body.setImmovable(false)
+    // Filtro para mantener el Pixel Art nítido
+    if (this.body.texture) {
+      this.body.texture.setFilter(Phaser.Textures.FilterMode.NEAREST)
+    }
 
-    // IMPORTANTE: gravedad del jugador
+    // Configuración de movimiento libre 2D
     this.body.setGravityY(0)
-    const arcadeBody = this.body.body as Phaser.Physics.Arcade.Body
-    this.body.body.allowGravity = false
-    // Para que el jugador no rebote raro
+    if (this.body.body) {
+      this.body.body.allowGravity = false
+    }
     this.body.setBounce(0)
 
-    // Ajuste del cuerpo físico
-    this.body.setSize(20, 32)
+    // Forzamos que la hitbox física mida lo mismo que le dimos visualmente (48x80)
+    this.body.setSize(200, 320)
 
-    this.label = scene.add.text(x, y - 24, `J${playerId}`, {
+    // Colocamos la etiqueta flotante J1 / J2 calculada sobre los 80px de altura
+    this.label = scene.add.text(x, y - 48, `J${playerId}`, {
       fontFamily: 'Share Tech Mono',
-      fontSize:   '9px',
-      color:      playerId === 1 ? '#aaaaaa' : '#777777',
+      fontSize:   '8px',
+      color:      playerId === 1 ? '#ffffff' : '#ffffff',
     }).setOrigin(0.5, 1).setDepth(11)
   }
 
   move(vx: number) {
-    // Solo mueve en horizontal.
-    // No tocamos la velocidad Y para no hacer que flote.
     this.body.setVelocityX(vx)
-
     this.updateLabel()
   }
 
   moveFree(vx: number, vy: number) {
-  this.body.setVelocity(vx, vy)
-  this.updateLabel()
+    this.body.setVelocity(vx, vy)
+    this.updateLabel()
   }
 
   jump() {
-    const arcadeBody = this.body.body as Phaser.Physics.Arcade.Body
-
-    // Solo puede saltar si está tocando el piso
-    if (arcadeBody.blocked.down) {
+    if (this.body.body && this.body.body.blocked.down) {
       this.body.setVelocityY(-420)
     }
   }
 
   updateLabel() {
+    // Mantiene la etiqueta centrada sobre su cabeza al caminar
     this.label.x = this.body.x
-    this.label.y = this.body.y - 24
+    this.label.y = this.body.y - 44
   }
 
   getPosition() {

@@ -25,6 +25,11 @@ export function createPhaserConfig(parent: HTMLElement): Phaser.Types.Core.GameC
         debug: false,
       },
     },
+
+    audio: {
+            disableWebAudio: true // Fuerza a usar HTML5 Audio, ideal para romper bloqueos de inicio
+        },
+        
     scene: [PreloadScene, MainMenuScene, SceneP1, SceneP2, HUDScene],
   }
 }
