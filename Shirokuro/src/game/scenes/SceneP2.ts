@@ -18,6 +18,7 @@ export class SceneP2 extends Phaser.Scene {
   private keyEnter!:  Phaser.Input.Keyboard.Key
   private keyBackspace!: Phaser.Input.Keyboard.Key
   private wallColliders!: Phaser.Physics.Arcade.StaticGroup
+  private keyDelete!: Phaser.Input.Keyboard.Key
 
   private devicePanel!: Phaser.GameObjects.Container
   private devicePanelText!: Phaser.GameObjects.Text
@@ -104,7 +105,7 @@ export class SceneP2 extends Phaser.Scene {
   .setDepth(999)
   .setVisible(false)
     this.createDevicePanel()
-    this.keyEnter.on('down', () => this.tryInteract())
+    this.keyDelete.on('down', () => this.tryInteract())
   }
 
   update() {
@@ -376,6 +377,7 @@ private closeDevicePanel() {
     this.cursors  = kb.createCursorKeys()
     this.keyEnter = kb.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
     this.keyBackspace = kb.addKey(Phaser.Input.Keyboard.KeyCodes.BACKSPACE)
+    this.keyDelete = kb.addKey(Phaser.Input.Keyboard.KeyCodes.DELETE)
   }
   private createWallColliders() {
     this.wallColliders = this.physics.add.staticGroup()
