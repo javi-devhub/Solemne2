@@ -3,6 +3,7 @@ import { Player } from '../objects/Player'
 import { ROOM_01_OBJECTS } from '../data/interactable'
 import { gameBus } from '@/composables/useGameEventBus'
 import { puzzle1State, type TeddyPart } from '../state/puzzle1State'
+import { Door } from '../objects/Door' // Ajusta la ruta de carpetas si es necesario
 
 const WORLD_W  = 1280
 const WORLD_H  = 720
@@ -31,13 +32,22 @@ export class SceneP1 extends Phaser.Scene {
   private isPuzzlePanelOpen = false
   private solvedMessageShown = false
 
+  private door!: Door
+  private doorObstacle!: Phaser.Physics.Arcade.Image
+
   constructor() { super({ key: 'SceneP1' }) }
 
   preload() {
-    this.load.image('bg-stage1', '/assets/backgrounds/scene1-pj1.png');
+    this.load.image('door-closed', '/assets/backgrounds/sprites/door-closed.png')
+    this.load.image('door-open',   '/assets/backgrounds/sprites/door-open.png')
   }
 
+
   create() {
+    // Resetear estado del puzzle al iniciar la escena (nueva partida)
+    puzzle1State.reset()
+    this.solvedMessageShown = false
+
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H)
     this.buildRoom()
 
@@ -47,6 +57,17 @@ export class SceneP1 extends Phaser.Scene {
 
     this.player = new Player(this, 300, FLOOR_Y - 40, 1, WORLD_W, WORLD_H)
     this.createWallColliders()
+
+    this.door = new Door(this, 570, 150, 'door-closed')
+    this.physics.add.collider(this.player.body, this.door.sprite)
+
+    this.doorObstacle = this.physics.add.staticImage(640, 135, '') // Sin textura (invisible)
+    this.doorObstacle.setSize(200, 30)
+    this.doorObstacle.refreshBody()
+    this.doorObstacle.setVisible(false)
+    this.door.linkObstacle(this.doorObstacle)
+
+    this.physics.add.collider(this.player.body, this.doorObstacle)
 
     //const floor = this.physics.add.staticImage(WORLD_W / 2, FLOOR_Y + 4, '__DEFAULT')
     //floor.setDisplaySize(WORLD_W, 8).refreshBody().setAlpha(0)
@@ -177,16 +198,17 @@ export class SceneP1 extends Phaser.Scene {
 
 }
   private createTeddyPanel() {
-  const panelBg = this.add.rectangle(320, 260, 420, 260, 0x050505, 0.95)
+  const panelBg = this.add.rectangle(320, 280, 440, 340, 0x050505, 0.95)
     .setStrokeStyle(1, 0x444444)
 
-  this.teddyPanelText = this.add.text(320, 260, '', {
+  this.teddyPanelText = this.add.text(320, 280, '', {
     fontFamily: 'Share Tech Mono',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#dddddd',
     align: 'left',
+    lineSpacing: 3,
     wordWrap: {
-      width: 360,
+      width: 390,
     },
   }).setOrigin(0.5)
 
@@ -210,7 +232,8 @@ private openTeddyPanel() {
 private refreshTeddyPanel() {
   const selectedPart = this.teddyParts[this.teddySelectedIndex]
 
-   if (puzzle1State.solved) {
+  // Estado final: J2 ya confirmó → ambas puertas abiertas
+  if (puzzle1State.solved) {
     this.teddyPanelText.setText(
       [
         '[ OSITO COSIDO ]',
@@ -218,10 +241,29 @@ private refreshTeddyPanel() {
         'El osito dejó de temblar.',
         'Las costuras parecen haberse acomodado.',
         '',
-        'Estado: SINCRONIZADO',
+        'Estado: CONFIRMADO',
         '',
-        'Se escuchó un clic metálico a lo lejos.',
-        'La puerta parece haberse desbloqueado.',
+        'La puerta se abrió.',
+        '',
+        'Q: cerrar',
+      ].join('\n'),
+    )
+    return
+  }
+
+  // J1 completó la secuencia, esperando que J2 confirme
+  if (puzzle1State.sequenceComplete) {
+    this.teddyPanelText.setText(
+      [
+        '[ OSITO COSIDO ]',
+        '',
+        'El osito quedó quieto.',
+        'Algo hizo clic en su interior.',
+        '',
+        'Estado: ESPERANDO CONFIRMACIÓN',
+        '',
+        'El otro jugador debe confirmar',
+        'desde su dispositivo.',
         '',
         'Q: cerrar',
       ].join('\n'),
@@ -231,22 +273,21 @@ private refreshTeddyPanel() {
 
   this.teddyPanelText.setText(
     [
-
       '[ OSITO COSIDO ]',
-    '',
-    'El osito tiene partes sueltas.',
-    'Algunas reaccionan con pequeños parpadeos.',
-    '',
-    'Pista:',
-    'La oreja parece responder primero.',
-    'La nariz vibra después.',
-    'El brazo se mueve al final.',
-    '',
-    `Parte seleccionada: ${selectedPart.toUpperCase()}`,
-    '',
-    'A / D: cambiar parte',
-    'E: girar parte',
-    'Q: cerrar',
+      '',
+      'El osito tiene partes sueltas.',
+      'Algunas reaccionan con pequeños parpadeos.',
+      '',
+      'Pista:',
+      'La oreja parece responder primero.',
+      'La nariz vibra después.',
+      'El brazo se mueve al final.',
+      '',
+      `Parte seleccionada: ${selectedPart.toUpperCase()}`,
+      '',
+      'A / D: cambiar parte',
+      'E: girar parte',
+      'Q: cerrar',
     ].join('\n'),
   )
 }
@@ -254,39 +295,35 @@ private refreshTeddyPanel() {
 private handleTeddyPanelInput() {
   if (Phaser.Input.Keyboard.JustDown(this.keyA)) {
     this.teddySelectedIndex--
-
     if (this.teddySelectedIndex < 0) {
       this.teddySelectedIndex = this.teddyParts.length - 1
     }
-
     this.refreshTeddyPanel()
   }
 
   if (Phaser.Input.Keyboard.JustDown(this.keyD)) {
     this.teddySelectedIndex++
-
     if (this.teddySelectedIndex >= this.teddyParts.length) {
       this.teddySelectedIndex = 0
     }
-
     this.refreshTeddyPanel()
   }
 
   if (Phaser.Input.Keyboard.JustDown(this.keyE)) {
     const selectedPart = this.teddyParts[this.teddySelectedIndex]
     const result = puzzle1State.rotatePart(selectedPart)
-
     this.showInspectMessage(result.messageP1)
     this.refreshTeddyPanel()
   }
 
+  // Abrir puerta J1 solo cuando puzzle1State.solved (J2 ya confirmó)
   if (puzzle1State.solved && !this.solvedMessageShown) {
     this.solvedMessageShown = true
-    this.showInspectMessage('Se escuchó un clic metálico. La puerta se desbloqueó.')
+    this.showInspectMessage('¡Confirmado! La puerta se desbloqueó.')
+    this.door.open()
   }
 
-
-  if (Phaser.Input.Keyboard.JustDown(this.keyQ)){
+  if (Phaser.Input.Keyboard.JustDown(this.keyQ)) {
     this.closeTeddyPanel()
   }
 }
@@ -313,24 +350,24 @@ private handleTeddyPanelInput() {
     this.addPuzzleObject(
       ROOM_01_OBJECTS[0].x,
       ROOM_01_OBJECTS[0].y,
-      '🧸', '#3a3030'
+      'teddy-sprite', '#3a3030'
     )
 
     this.addDoor(180, floorY)
     this.addDoor(WORLD_W - 180, floorY)
   }
 
-  private addPuzzleObject(x: number, y: number, icon: string, color: string) {
+  private addPuzzleObject(x: number, y: number, textureKey: string, _color: string) {
     // Círculo de interacción (radio visual)
     const g = this.add.graphics()
     g.lineStyle(1, 0x2a2020, 0.4)
     g.strokeCircle(x, y, INTERACT_DIST)
 
-    // Placeholder visual del objeto
-    this.add.rectangle(x, y, 48, 48, 0x1a1010)
-      .setStrokeStyle(1, 0x2e2020).setDepth(5)
-    this.add.text(x, y, icon, { fontSize: '24px' })
-      .setOrigin(0.5).setDepth(6)
+    // Sprite del objeto (reemplaza el emoji placeholder)
+    this.add.image(x, y, textureKey)
+      .setDisplaySize(48, 48)
+      .setOrigin(0.5)
+      .setDepth(6)
   }
 
   private addDoor(x: number, floorY: number) {

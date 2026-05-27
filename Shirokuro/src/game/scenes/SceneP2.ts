@@ -3,6 +3,7 @@ import { Player } from '../objects/Player'
 import { ROOM_01_OBJECTS } from '../data/interactable'
 import { gameBus } from '@/composables/useGameEventBus'
 import { puzzle1State } from '../state/puzzle1State'
+import { Door } from '../objects/Door'
 
 const WORLD_W       = 1280
 const WORLD_H       = 720
@@ -25,13 +26,27 @@ export class SceneP2 extends Phaser.Scene {
   private inspectText!: Phaser.GameObjects.Text
   private inspectTextTimer?: Phaser.Time.TimerEvent
 
+  // ── Puerta J2 ──────────────────────────────────────────────────────
+  // Posición: ajusta doorX / doorY para que coincida con tu fondo
+  // Una vez que tengas el sprite de puerta, ya todo está conectado.
+  private door2!: Door
+  private door2Obstacle!: Phaser.Physics.Arcade.Image
+  private door2Solved = false
+  // Coordenadas de la puerta en el mundo de J2 — ajústalas a tu fondo
+  private readonly DOOR2_X = 570
+  private readonly DOOR2_Y = 150
+
   constructor() { super({ key: 'SceneP2' }) }
 
   preload() {
-    this.load.image('bg-stage1-j2', '/assets/backgrounds/scene1-pj2.png');
+    this.load.image('door-closed', '/assets/backgrounds/sprites/door-closed.png')
+    this.load.image('door-open',   '/assets/backgrounds/sprites/door-open.png')
   }
 
   create() {
+    // Resetear estado al iniciar (nueva partida)
+    this.door2Solved = false
+
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H)
     this.buildRoom()
 
@@ -40,6 +55,20 @@ export class SceneP2 extends Phaser.Scene {
     this.background.setDepth(-1); // Detrás de jugadores y paneles
 
     this.player = new Player(this, 520, 530, 2, WORLD_W, WORLD_H)
+
+    // ── Puerta J2 ──────────────────────────────────────────────────
+    // La textura 'door-closed' ya existe — cuando tengas tu propio sprite
+    // para J2 solo cambia el segundo argumento del constructor de Door.
+    this.door2 = new Door(this, this.DOOR2_X, this.DOOR2_Y, 'door-closed')
+    this.physics.add.collider(this.player.body, this.door2.sprite)
+
+    // Obstáculo invisible que bloquea físicamente el paso por la puerta
+    this.door2Obstacle = this.physics.add.staticImage(this.DOOR2_X, this.DOOR2_Y - 15, '')
+    this.door2Obstacle.setSize(200, 30)
+    this.door2Obstacle.refreshBody()
+    this.door2Obstacle.setVisible(false)
+    this.door2.linkObstacle(this.door2Obstacle)
+    this.physics.add.collider(this.player.body, this.door2Obstacle)
 
     //const floor = this.physics.add.staticImage(WORLD_W / 2, FLOOR_Y + 4, '__DEFAULT')
     //floor.setDisplaySize(WORLD_W, 8).refreshBody().setAlpha(0)
@@ -80,9 +109,15 @@ export class SceneP2 extends Phaser.Scene {
 
   update() {
 
+    // Abrir puerta J2 solo cuando puzzle1State.solved (J2 ya presionó ENTER)
+    if (puzzle1State.solved && !this.door2Solved) {
+      this.door2Solved = true
+      this.door2.open()
+    }
+
     if (this.isDevicePanelOpen) {
     if (Phaser.Input.Keyboard.JustDown(this.keyEnter)) {
-      this.refreshDevicePanel()
+      this.handleEnterOnDevice()
     }
 
     if (Phaser.Input.Keyboard.JustDown(this.keyBackspace)) {
@@ -176,16 +211,17 @@ export class SceneP2 extends Phaser.Scene {
 
 
 private createDevicePanel() {
-  const panelBg = this.add.rectangle(320, 260, 420, 260, 0x050505, 0.95)
+  const panelBg = this.add.rectangle(320, 280, 440, 340, 0x050505, 0.95)
     .setStrokeStyle(1, 0x334455)
 
-  this.devicePanelText = this.add.text(320, 260, '', {
+  this.devicePanelText = this.add.text(320, 280, '', {
     fontFamily: 'Share Tech Mono',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#dddddd',
     align: 'left',
+    lineSpacing: 3,
     wordWrap: {
-      width: 360,
+      width: 390,
     },
   }).setOrigin(0.5)
 
@@ -209,8 +245,7 @@ private openDevicePanel() {
 private refreshDevicePanel() {
   const status = puzzle1State.getDeviceStatus()
 
-
-   if (puzzle1State.solved) {
+  if (puzzle1State.solved) {
     this.devicePanelText.setText(
       [
         '[ DISPOSITIVO MÉDICO ]',
@@ -218,12 +253,28 @@ private refreshDevicePanel() {
         'La pantalla dejó de parpadear.',
         'La línea de vitalidad se mantiene estable.',
         '',
-        'Estado actual:',
+        'Estado: CONFIRMADO',
         status,
         '',
-        'Sistema sincronizado.',
-        'La puerta parece haberse desbloqueado.',
+        '¡La puerta se abrió!',
         '',
+        'Backspace: cerrar',
+      ].join('\n'),
+    )
+    return
+  }
+
+  if (puzzle1State.sequenceComplete) {
+    this.devicePanelText.setText(
+      [
+        '[ DISPOSITIVO MÉDICO ]',
+        '',
+        'La pantalla muestra una señal estable.',
+        'El otro jugador sincronizó su parte.',
+        '',
+        status,
+        '',
+        '▶ ENTER: confirmar y abrir la puerta',
         'Backspace: cerrar',
       ].join('\n'),
     )
@@ -233,22 +284,43 @@ private refreshDevicePanel() {
   this.devicePanelText.setText(
     [
       '[ DISPOSITIVO MÉDICO ]',
-    '',
-    'La pantalla parpadea con una señal irregular.',
-    'Cada ajuste del otro jugador altera la lectura.',
-    '',
-    'Pista:',
-    'La señal tiene tres zonas alteradas.',
-    'Cada cambio correcto estabiliza una zona.',
-    'Si el orden falla, la lectura vuelve al inicio.',
-    '',
-    'Estado actual:',
-    status,
-    '',
-    'ENTER: actualizar lectura',
-    'BACKSPACE: cerrar',
+      '',
+      'La pantalla parpadea con una señal irregular.',
+      'Cada ajuste del otro jugador altera la lectura.',
+      '',
+      'Pista:',
+      'La señal tiene tres zonas alteradas.',
+      'Cada cambio correcto estabiliza una zona.',
+      'Si el orden falla, la lectura vuelve al inicio.',
+      '',
+      'Estado actual:',
+      status,
+      '',
+      'ENTER: actualizar lectura',
+      'BACKSPACE: cerrar',
     ].join('\n'),
   )
+}
+
+/**
+ * J2 presiona ENTER en el panel:
+ * - Si la secuencia de J1 está completa → confirmar y abrir ambas puertas
+ * - Si no → solo refrescar la lectura
+ */
+private handleEnterOnDevice() {
+  const result = puzzle1State.confirmDevice()
+
+  if (result.confirmed) {
+    // Puzzle resuelto: mensaje + refrescar panel (las puertas se abren en update())
+    this.showInspectMessage('¡Confirmado! La puerta se desbloqueó.')
+    this.refreshDevicePanel()
+  } else {
+    // Solo refrescar lectura
+    this.refreshDevicePanel()
+    if (!puzzle1State.sequenceComplete) {
+      this.showInspectMessage('Señal inestable. El otro jugador aún no completó su parte.')
+    }
+  }
 }
 
 private closeDevicePanel() {
@@ -274,22 +346,23 @@ private closeDevicePanel() {
     this.addPuzzleObject(
       ROOM_01_OBJECTS[0].x,
       ROOM_01_OBJECTS[0].y,
-      '📟', '#1a2030'
+      'device-sprite', '#1a2030'
     )
 
     this.addDoor(180, floorY)
     this.addDoor(WORLD_W - 180, floorY)
   }
 
-  private addPuzzleObject(x: number, y: number, icon: string, _color: string) {
+  private addPuzzleObject(x: number, y: number, textureKey: string, _color: string) {
     const g = this.add.graphics()
     g.lineStyle(1, 0x202a30, 0.4)
     g.strokeCircle(x, y, INTERACT_DIST)
 
-    this.add.rectangle(x, y, 48, 48, 0x101520)
-      .setStrokeStyle(1, 0x202e3a).setDepth(5)
-    this.add.text(x, y, icon, { fontSize: '24px' })
-      .setOrigin(0.5).setDepth(6)
+    // Sprite del objeto (reemplaza el emoji placeholder)
+    this.add.image(x, y, textureKey)
+      .setDisplaySize(48, 48)
+      .setOrigin(0.5)
+      .setDepth(6)
   }
 
   private addDoor(x: number, floorY: number) {
