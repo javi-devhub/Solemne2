@@ -76,7 +76,6 @@ export class Door {
       onComplete: () => {
         // Swap de textura: cerrada → abierta (marco igual, vano oscuro)
         this.sprite.setTexture('door-open')
-        this.sprite.x = this.sprite.x   // reposicionar por si acaso
       },
     })
   }
