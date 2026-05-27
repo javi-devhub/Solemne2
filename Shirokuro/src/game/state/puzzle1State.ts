@@ -113,9 +113,9 @@ export const puzzle1State = {
     if (this.sequenceComplete) {
       return '▶ SEÑAL LISTA — Presiona ENTER para confirmar.'
     }
-    if (this.progress === 0) return '░ Señal muy inestable. No hay sincronía.'
-    if (this.progress === 1) return '▒ Señal parcialmente estable. Algo cambió en el primer punto.'
-    if (this.progress === 2) return '▓ Señal casi estable. Falta un último ajuste.'
+    if (this.progress === 0) return ' Señal muy inestable. No hay sincronía.'
+    if (this.progress === 1) return ' Señal parcialmente estable. Algo cambió en el primer punto.'
+    if (this.progress === 2) return ' Señal casi estable. Falta un último ajuste.'
     return 'Lectura desconocida.'
   },
 }
