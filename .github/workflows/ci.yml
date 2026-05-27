@@ -67,3 +67,7 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Build Docker image
+        working-directory: Shirokuro
+        run: docker build -t shirokuro .
