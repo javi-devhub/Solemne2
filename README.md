@@ -31,6 +31,15 @@ Antes de ejecutar el proyecto, se debe tener instalado:
 * pnpm
 * Docker Desktop, solo si se desea ejecutar el proyecto mediante contenedor
 
+## Recomendación para Windows:
+Se sugiere ubicar el proyecto en una ruta simple del disco local, por ejemplo:
+
+```bash
+C:\Solemne2-main
+```
+
+Evitar ejecutar el proyecto desde el Escritorio, Descargas o carpetas sincronizadas con OneDrive, ya que pueden aparecer problemas de permisos, rutas largas o bloqueo de archivos al usar `pnpm dev`.
+
 ---
 
 ### Instalación de dependencias
