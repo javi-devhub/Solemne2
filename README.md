@@ -21,7 +21,7 @@ El foco est谩 en exploraci贸n, percepci贸n alterada y tensi贸n psicol贸gica m谩s
 - **Containerization:** Docker  
 - **3CI/CD:** GitHub Actions  
 
-## Instalaci髇 y ejecuci髇 del proyecto
+## Instalaci贸n y ejecuci贸n del proyecto
 
 ### Requisitos previos
 
@@ -33,9 +33,9 @@ Antes de ejecutar el proyecto, se debe tener instalado:
 
 ---
 
-### Instalaci髇 de dependencias
+### Instalaci贸n de dependencias
 
-Desde la ra韟 del repositorio, entrar a la carpeta del juego:
+Desde la ra铆z del repositorio, entrar a la carpeta del juego:
 
 ```bash
 cd Shirokuro
@@ -65,7 +65,7 @@ http://localhost:3000
 
 ---
 
-### Generar build de producci髇
+### Generar build de producci贸n
 
 Para compilar el proyecto:
 
@@ -76,9 +76,9 @@ pnpm build
 ---
 
 
-## Ejecuci髇 con Docker
+## Ejecuci贸n con Docker
 
-El proyecto tambi閚 puede ejecutarse mediante Docker.
+El proyecto tambi茅n puede ejecutarse mediante Docker.
 
 Desde la carpeta `Shirokuro`, construir la imagen:
 
