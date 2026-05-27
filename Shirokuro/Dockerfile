@@ -12,7 +12,6 @@ COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install --frozen-lockfile --ignore-scripts \
     && pnpm rebuild esbuild vue-demi
-# ── Etapa 2: Build ────────────────────────────────────────────
 FROM deps AS builder
 
 # Copiar el código fuente (node_modules ya está en la capa anterior)
@@ -21,7 +20,7 @@ COPY . .
 # vue-tsc verifica tipos, vite empaqueta y copia /public al /dist
 RUN pnpm build
 
-# ── Etapa 3: Producción ───────────────────────────────────────
+
 # nginx:alpine pesa ~45 MB y no incluye node_modules ni código fuente
 FROM nginx:alpine AS production
 
