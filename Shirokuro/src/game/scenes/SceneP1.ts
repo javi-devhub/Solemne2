@@ -352,6 +352,8 @@ private handleTeddyPanelInput() {
       ROOM_01_OBJECTS[0].y,
       'teddy-sprite', '#3a3030'
     )
+
+    
   }
 
   private addPuzzleObject(x: number, y: number, textureKey: string, _color: string) {
@@ -362,11 +364,10 @@ private handleTeddyPanelInput() {
 
     // Sprite del objeto (reemplaza el emoji placeholder)
     this.add.image(x, y, textureKey)
-      .setDisplaySize(48, 48)
+      .setDisplaySize(68, 48)
       .setOrigin(0.5)
       .setDepth(6)
   }
-
 
   private addDoor(x: number, floorY: number) {
     const dw = 60, dh = 100
