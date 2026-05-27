@@ -22,7 +22,7 @@ describe('InventoryStore', () => {
   it('adds an item to player 1', () => {
     const store = useInventoryStore()
     store.addItem(1, mockItem)
-    expect(store.player1Items).toHaveLength(1)
+    expect(store.player1Items.filter(Boolean)).toHaveLength(1)
     expect(store.hasItem(1, 'key-001')).toBe(true)
   })
 
@@ -30,7 +30,7 @@ describe('InventoryStore', () => {
     const store = useInventoryStore()
     store.addItem(1, mockItem)
     store.addItem(1, mockItem)
-    expect(store.player1Items).toHaveLength(1)
+    expect(store.player1Items.filter(Boolean)).toHaveLength(1)
   })
 
   it('removes an item', () => {

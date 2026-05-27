@@ -25,6 +25,7 @@ export class SceneP2 extends Phaser.Scene {
 
   private inspectText!: Phaser.GameObjects.Text
   private inspectTextTimer?: Phaser.Time.TimerEvent
+  private door!: Door
 
   // ── Puerta J2 ──────────────────────────────────────────────────────
   // Posición: ajusta doorX / doorY para que coincida con tu fondo
@@ -43,6 +44,7 @@ export class SceneP2 extends Phaser.Scene {
     this.load.image('door-open',   '/assets/backgrounds/sprites/door-open.png')
   }
 
+
   create() {
     // Resetear estado al iniciar (nueva partida)
     this.door2Solved = false
@@ -55,6 +57,8 @@ export class SceneP2 extends Phaser.Scene {
     this.background.setDepth(-1); // Detrás de jugadores y paneles
 
     this.player = new Player(this, 520, 530, 2, WORLD_W, WORLD_H)
+    this.door = new Door(this, 570, 155, 'door-closed')
+    
 
     // ── Puerta J2 ──────────────────────────────────────────────────
     // La textura 'door-closed' ya existe — cuando tengas tu propio sprite
@@ -86,6 +90,12 @@ export class SceneP2 extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H)
     this.cameras.main.setBackgroundColor('#080606')
     this.cameras.main.startFollow(this.player.body, true, 0.1, 0.1)
+
+    const doorStopJ2 = this.physics.add.staticImage(640, 145, '')
+    doorStopJ2.setSize(200, 30)
+    doorStopJ2.refreshBody()
+    doorStopJ2.setVisible(false)  
+    this.physics.add.collider(this.player.body, doorStopJ2)
 
     this.setupInput()
 
@@ -348,9 +358,6 @@ private closeDevicePanel() {
       ROOM_01_OBJECTS[0].y,
       'device-sprite', '#1a2030'
     )
-
-    this.addDoor(180, floorY)
-    this.addDoor(WORLD_W - 180, floorY)
   }
 
   private addPuzzleObject(x: number, y: number, textureKey: string, _color: string) {
@@ -364,6 +371,7 @@ private closeDevicePanel() {
       .setOrigin(0.5)
       .setDepth(6)
   }
+
 
   private addDoor(x: number, floorY: number) {
     const dw = 60, dh = 100

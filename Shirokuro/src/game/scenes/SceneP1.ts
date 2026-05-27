@@ -352,9 +352,6 @@ private handleTeddyPanelInput() {
       ROOM_01_OBJECTS[0].y,
       'teddy-sprite', '#3a3030'
     )
-
-    this.addDoor(180, floorY)
-    this.addDoor(WORLD_W - 180, floorY)
   }
 
   private addPuzzleObject(x: number, y: number, textureKey: string, _color: string) {
@@ -369,6 +366,7 @@ private handleTeddyPanelInput() {
       .setOrigin(0.5)
       .setDepth(6)
   }
+
 
   private addDoor(x: number, floorY: number) {
     const dw = 60, dh = 100

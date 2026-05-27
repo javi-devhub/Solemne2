@@ -9,26 +9,61 @@ on:
 jobs:
   lint-test-build:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Shirokuro
     steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v3
         with:
-          version: 8
+          version: 9
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
+          cache-dependency-path: 'Shirokuro/pnpm-lock.yaml'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Create ESLint config
+        run: |
+          cat > .eslintrc.cjs <<'EOF'
+          module.exports = {
+            root: true,
+            env: {
+              browser: true,
+              node: true,
+              es2022: true,
+            },
+            parser: 'vue-eslint-parser',
+            parserOptions: {
+              parser: '@typescript-eslint/parser',
+              ecmaVersion: 'latest',
+              sourceType: 'module',
+            },
+            extends: [
+              'eslint:recommended',
+              'plugin:vue/vue3-recommended',
+              'plugin:@typescript-eslint/recommended',
+            ],
+            rules: {
+              'vue/multi-word-component-names': 'off',
+              '@typescript-eslint/no-unused-vars': 'warn',
+              '@typescript-eslint/no-explicit-any': 'off',
+              'no-empty': 'off',
+            },
+          }
+          EOF
 
       - name: Lint
         run: pnpm lint
 
       - name: Run tests
-        run: pnpm test --run
+        run: pnpm test -- --run
 
       - name: Build
         run: pnpm build

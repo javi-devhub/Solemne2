@@ -22,11 +22,16 @@ export const useInventoryStore = defineStore('inventory', () => {
   }
 
   function addItem(playerId: 1 | 2, item: Item): boolean {
-    const inv = playerId === 1 ? player1Items : player2Items
-    const slot = inv.value.findIndex(s => s === null)
-    if (slot === -1) return false  // inventario lleno
-    inv.value[slot] = item
-    return true
+  const inv = playerId === 1 ? player1Items : player2Items
+
+  const alreadyExists = inv.value.some(s => s?.id === item.id)
+  if (alreadyExists) return false
+
+  const slot = inv.value.findIndex(s => s === null)
+  if (slot === -1) return false // inventario lleno
+
+  inv.value[slot] = item
+  return true
   }
 
   function removeItem(playerId: 1 | 2, itemId: string) {

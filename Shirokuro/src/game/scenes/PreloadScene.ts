@@ -32,6 +32,32 @@ export class PreloadScene extends Phaser.Scene {
       progressBox.destroy()
       loadingText.destroy()
     })
+
+    // ── 1. AGREGA TODAS LAS CARGAS DE TU JUEGO AQUÍ ABAJO ─────────────────
+    
+    // Fondos de las habitaciones
+    this.load.image('bg-stage1', '/assets/backgrounds/scene1-pj1.png')
+    this.load.image('bg-stage1-j2', '/assets/backgrounds/scene1-pj2.png')
+
+    // Sprites de los personajes — 4 direcciones por jugador
+    this.load.image('player1-down',  'assets/backgrounds/sprites/player1-down.png')
+    this.load.image('player1-up',    'assets/backgrounds/sprites/player1-up.png')
+    this.load.image('player1-right', 'assets/backgrounds/sprites/player1-right.png')
+    this.load.image('player1-left',  'assets/backgrounds/sprites/player1-left.png')
+
+    this.load.image('player2-down',  'assets/backgrounds/sprites/player2-down.png')
+    this.load.image('player2-up',    'assets/backgrounds/sprites/player2-up.png')
+    this.load.image('player2-right', 'assets/backgrounds/sprites/player2-right.png')
+    this.load.image('player2-left',  'assets/backgrounds/sprites/player2-left.png')
+
+    // Puertas interactivas
+    this.load.image('door-closed', '/assets/sprites/door-closed.png')
+    this.load.image('door-open', '/assets/sprites/door_open.png')
+
+    // Audios
+    this.load.audio('musica-menu', '/audio/puzzle1.mp3');
+    
+    // ──────────────────────────────────────────────────────────────────────
   }
 
   create() {
@@ -41,5 +67,21 @@ export class PreloadScene extends Phaser.Scene {
     this.scene.launch('HUDScene')
     // PreloadScene se detiene — ya no hace nada
     this.scene.stop()
-  }
+
+    const musica = this.sound.add('musica-menu', { loop: true, volume: 0.5 });
+    musica.play();
+
+    // Activar el despertador por si el navegador bloquea el autoplay
+    window.addEventListener('click', () => {
+        if (this.sound && typeof this.sound.resumeAll === 'function') {
+            this.sound.resumeAll();
+        }
+        if (!musica.isPlaying) {
+            musica.play();
+        }
+    }, { once: true });
+
+    // Al final, tu cambio de escena al menú principal
+    this.scene.start('MainMenuScene');
 }
+  }
