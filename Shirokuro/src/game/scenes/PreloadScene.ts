@@ -53,7 +53,8 @@ export class PreloadScene extends Phaser.Scene {
     // Puertas interactivas
     this.load.image('door-closed', '/assets/sprites/door-closed.png')
     this.load.image('door-open', '/assets/sprites/door_open.png')
-
+    this.load.image('teddy-sprite', '/assets/backgrounds/sprites/teddy-bear.png')
+    this.load.image('device-sprite', '/assets/backgrounds/sprites/device-icon.png')
     // Audios
     this.load.audio('musica-menu', '/audio/puzzle1.mp3');
     
