@@ -3,8 +3,8 @@ import type { InteractableObject } from '@/types/interactable'
 export const ROOM_01_OBJECTS: InteractableObject[] = [
   {
     id: 'objeto-central',
-    x: 640,
-    y: 480,   // se ajusta al buildRoom
+    x: 740,
+    y: 400,   // se ajusta al buildRoom
     width: 48,
     height: 48,
     descriptionP1: '"Es mi osito cosido.\nLo recuerdo perfectamente.\nTiene un botón en el pecho."',

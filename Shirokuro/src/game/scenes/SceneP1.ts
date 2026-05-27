@@ -38,7 +38,8 @@ export class SceneP1 extends Phaser.Scene {
 
   preload() {
 
-  this.load.image('door-closed', '/assets/backgrounds/sprites/door-closed.png')
+  this.load.image('door-closed', '/assets/backgrounds/sprites/door-closed1.png')
+    this.load.image('teddy-bear', '/assets/backgrounds/sprites/teddy-bear.png')
   }
 
 
@@ -330,23 +331,21 @@ private handleTeddyPanelInput() {
       ROOM_01_OBJECTS[0].y,
       '🧸', '#3a3030'
     )
-
-    this.addDoor(180, floorY)
-    this.addDoor(WORLD_W - 180, floorY)
   }
 
   private addPuzzleObject(x: number, y: number, icon: string, color: string) {
     // Círculo de interacción (radio visual)
-    const g = this.add.graphics()
-    g.lineStyle(1, 0x2a2020, 0.4)
-    g.strokeCircle(x, y, INTERACT_DIST)
+    //const g = this.add.graphics()
+    //g.lineStyle(1, 0x2a2020, 0.4)
+    //g.strokeCircle(x, y, INTERACT_DIST)
 
-    // Placeholder visual del objeto
-    this.add.rectangle(x, y, 48, 48, 0x1a1010)
-      .setStrokeStyle(1, 0x2e2020).setDepth(5)
-    this.add.text(x, y, icon, { fontSize: '24px' })
-      .setOrigin(0.5).setDepth(6)
+
+     this.add.image(x, y, 'teddy-bear')
+      .setDisplaySize(80, 55)   // ajusta tamaño
+      .setOrigin(0.5)
+      .setDepth(6)
   }
+
 
   private addDoor(x: number, floorY: number) {
     const dw = 60, dh = 100

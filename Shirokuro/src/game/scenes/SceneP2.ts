@@ -3,6 +3,7 @@ import { Player } from '../objects/Player'
 import { ROOM_01_OBJECTS } from '../data/interactable'
 import { gameBus } from '@/composables/useGameEventBus'
 import { puzzle1State } from '../state/puzzle1State'
+import { Door } from '../objects/Door'
 
 const WORLD_W       = 1280
 const WORLD_H       = 720
@@ -24,8 +25,16 @@ export class SceneP2 extends Phaser.Scene {
 
   private inspectText!: Phaser.GameObjects.Text
   private inspectTextTimer?: Phaser.Time.TimerEvent
+  private door!: Door
 
   constructor() { super({ key: 'SceneP2' }) }
+
+   preload() {
+
+  this.load.image('door-closed', '/assets/backgrounds/sprites/door-closed2.png')
+  this.load.image('device-icon', '/assets/backgrounds/sprites/device-icon.png')
+
+  }
 
 
   create() {
@@ -37,6 +46,8 @@ export class SceneP2 extends Phaser.Scene {
     this.background.setDepth(-1); // Detrás de jugadores y paneles
 
     this.player = new Player(this, 520, 530, 2, WORLD_W, WORLD_H)
+    this.door = new Door(this, 570, 155, 'door-closed')
+    
 
     //const floor = this.physics.add.staticImage(WORLD_W / 2, FLOOR_Y + 4, '__DEFAULT')
     //floor.setDisplaySize(WORLD_W, 8).refreshBody().setAlpha(0)
@@ -54,6 +65,12 @@ export class SceneP2 extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H)
     this.cameras.main.setBackgroundColor('#080606')
     this.cameras.main.startFollow(this.player.body, true, 0.1, 0.1)
+
+    const doorStopJ2 = this.physics.add.staticImage(640, 145, '')
+    doorStopJ2.setSize(200, 30)
+    doorStopJ2.refreshBody()
+    doorStopJ2.setVisible(false)  
+    this.physics.add.collider(this.player.body, doorStopJ2)
 
     this.setupInput()
 
@@ -273,21 +290,16 @@ private closeDevicePanel() {
       ROOM_01_OBJECTS[0].y,
       '📟', '#1a2030'
     )
-
-    this.addDoor(180, floorY)
-    this.addDoor(WORLD_W - 180, floorY)
   }
 
   private addPuzzleObject(x: number, y: number, icon: string, _color: string) {
-    const g = this.add.graphics()
-    g.lineStyle(1, 0x202a30, 0.4)
-    g.strokeCircle(x, y, INTERACT_DIST)
 
-    this.add.rectangle(x, y, 48, 48, 0x101520)
-      .setStrokeStyle(1, 0x202e3a).setDepth(5)
-    this.add.text(x, y, icon, { fontSize: '24px' })
-      .setOrigin(0.5).setDepth(6)
+    this.add.image(x, y, 'device-icon')
+      .setDisplaySize(60, 40)   // ajusta tamaño
+      .setOrigin(0.5)
+      .setDepth(6)
   }
+
 
   private addDoor(x: number, floorY: number) {
     const dw = 60, dh = 100
