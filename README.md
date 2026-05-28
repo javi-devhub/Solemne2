@@ -107,3 +107,44 @@ Abrir en el navegador:
 http://localhost:8080
 ```
 
+## Controles del juego
+
+### Controles generales
+
+| Acción                                  | Tecla |
+| --------------------------------------- | ----- |
+| Abrir / cerrar menú de pausa            | `ESC` |
+| Abrir / cerrar inventario del Jugador 1 | `I`   |
+| Abrir / cerrar inventario del Jugador 2 | `O`   |
+
+---
+
+### Jugador 1
+
+| Acción                                           | Tecla     |
+| ------------------------------------------------ | --------- |
+| Mover arriba                                     | `W`       |
+| Mover abajo                                      | `S`       |
+| Mover izquierda                                  | `A`       |
+| Mover derecha                                    | `D`       |
+| Inspeccionar objeto / abrir panel del osito      | `E`       |
+| Cambiar parte seleccionada en el panel del osito | `A` / `D` |
+| Girar parte seleccionada del osito               | `E`       |
+| Cerrar panel del osito                           | `Q`       |
+
+---
+
+### Jugador 2
+
+| Acción                                            | Tecla       |
+| ------------------------------------------------- | ----------- |
+| Mover arriba                                      | `↑`         |
+| Mover abajo                                       | `↓`         |
+| Mover izquierda                                   | `←`         |
+| Mover derecha                                     | `→`         |
+| Inspeccionar objeto / abrir panel del dispositivo | `P`         |
+| Confirmar / actualizar lectura del dispositivo    | `ENTER`     |
+| Cerrar panel del dispositivo                      | `BACKSPACE` |
+
+---
+
