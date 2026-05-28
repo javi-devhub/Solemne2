@@ -111,10 +111,14 @@ http://localhost:8080
 También se puede ejecutar el proyecto descargando la imagen publicada en Docker Hub:
 
 ```bash
-docker pull dedlis/shirokuro:v1.0
-docker run -p 8080:80 dedlis/shirokuro:v1.0
+docker pull dedlis/shirokuro:v1.1
+docker run -p 8080:80 dedlis/shirokuro:v1.1
 ```
+Abrir en el navegador:
 
+```text
+http://localhost:8080
+```
 
 ## Controles del juego
 
