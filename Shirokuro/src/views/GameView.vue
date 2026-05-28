@@ -2,7 +2,6 @@
   <div class="game-view">
     <GameCanvas />
 
-    <!-- Inventarios como overlay Vue sobre el canvas -->
     <InventoryOverlay
       :playerId="1"
       :isOpen="invStore.inv1Open"
@@ -15,42 +14,46 @@
       :items="invStore.player2Items"
       closeKey="O"
     />
-    
+
     <div v-if="isPaused" class="pause-overlay">
       <div class="pause-panel">
         <h2 class="pause-title">PAUSA</h2>
         <div class="pause-divider" />
-
-        <button class="pause-btn" @click="resumeGame">
-          CONTINUAR
-        </button>
-
-        <button class="pause-btn" @click="goHome">
-          MENÚ PRINCIPAL
-        </button>
+        <button class="pause-btn" @click="resumeGame">CONTINUAR</button>
+        <button class="pause-btn" @click="goHome">MENÚ PRINCIPAL</button>
       </div>
     </div>
+
+    <!-- Overlays fuera del panel de pausa para que cubran toda la pantalla -->
+    <GlitchOverlay :active="glitchStore.active" />
+    <ScreamerOverlay :active="screamerStore.active" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import GameCanvas from '@/components/game/GameCanvas.vue'
-import InventoryOverlay from '@/components/game/InventoryOverlay.vue'
-import { useInventoryStore } from '@/stores/inventoryStore'
-import { useGameStore } from '@/stores/gameStore'
-import { gameBus } from '@/composables/useGameEventBus'
-import { getGame } from '@/game/mainGame'
+import GameCanvas        from '@/components/game/GameCanvas.vue'
+import InventoryOverlay  from '@/components/game/InventoryOverlay.vue'
+import GlitchOverlay     from '@/components/game/GlitchOverlay.vue'
+import ScreamerOverlay   from '@/components/game/ScreamerOverlay.vue'
+import { useInventoryStore }  from '@/stores/inventoryStore'
+import { useGameStore }       from '@/stores/gameStore'
+import { useGlitchStore }     from '@/stores/glitchStore'
+import { useScreamerStore }   from '@/stores/screamerStore'
+import { gameBus }            from '@/composables/useGameEventBus'
+import { getGame }            from '@/game/mainGame'
 
-const router    = useRouter()
-const invStore  = useInventoryStore()
-const gameStore = useGameStore()
+const router        = useRouter()
+const invStore      = useInventoryStore()
+const gameStore     = useGameStore()
+const glitchStore   = useGlitchStore()
+const screamerStore = useScreamerStore()
+
 const isPaused = ref(false)
 
 function pausePhaserScenes() {
   const game = getGame()
-
   game?.scene.pause('SceneP1')
   game?.scene.pause('SceneP2')
   game?.scene.pause('HUDScene')
@@ -58,7 +61,6 @@ function pausePhaserScenes() {
 
 function resumePhaserScenes() {
   const game = getGame()
-
   game?.scene.resume('SceneP1')
   game?.scene.resume('SceneP2')
   game?.scene.resume('HUDScene')
@@ -92,20 +94,24 @@ function onKeyDown(e: KeyboardEvent) {
       invStore.toggleInventory(2)
       break
     case 'Escape':
-    e.preventDefault()
-
-    if (isPaused.value) {
-    resumeGame()
-    } else {
-    pauseGame()
-    }
-   break
+      e.preventDefault()
+      if (isPaused.value) resumeGame()
+      else pauseGame()
+      break
   }
 }
 
 onMounted(() => {
   gameStore.setPhase('playing')
   window.addEventListener('keydown', onKeyDown)
+
+  gameBus.on('glitch:trigger', (ms) => {
+    console.log('glitch:trigger recibido en GameView', ms)
+    glitchStore.trigger(ms)
+  })
+
+  // Screamer aleatorio entre 30s y 90s
+  screamerStore.startRandom(15000, 45000)
 })
 
 onUnmounted(() => {
@@ -115,6 +121,8 @@ onUnmounted(() => {
   gameBus.off('p2:proximity')
   gameBus.off('p1:interact')
   gameBus.off('p2:interact')
+  gameBus.off('glitch:trigger')
+  screamerStore.stop()
 })
 </script>
 

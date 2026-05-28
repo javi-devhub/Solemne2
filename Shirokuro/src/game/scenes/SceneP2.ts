@@ -18,7 +18,7 @@ export class SceneP2 extends Phaser.Scene {
   private keyEnter!:  Phaser.Input.Keyboard.Key
   private keyBackspace!: Phaser.Input.Keyboard.Key
   private wallColliders!: Phaser.Physics.Arcade.StaticGroup
-  private keyDelete!: Phaser.Input.Keyboard.Key
+  private keyP!: Phaser.Input.Keyboard.Key
 
   private devicePanel!: Phaser.GameObjects.Container
   private devicePanelText!: Phaser.GameObjects.Text
@@ -34,8 +34,8 @@ export class SceneP2 extends Phaser.Scene {
   private door2Obstacle!: Phaser.Physics.Arcade.Image
   private door2Solved = false
   // Coordenadas de la puerta en el mundo de J2 — ajústalas a tu fondo
-  private readonly DOOR2_X = 570
-  private readonly DOOR2_Y = 150
+  private readonly DOOR2_X = 550
+  private readonly DOOR2_Y = 155
 
   constructor() { super({ key: 'SceneP2' }) }
 
@@ -105,7 +105,7 @@ export class SceneP2 extends Phaser.Scene {
   .setDepth(999)
   .setVisible(false)
     this.createDevicePanel()
-    this.keyDelete.on('down', () => this.tryInteract())
+    this.keyP.on('down', () => this.tryInteract())
   }
 
   update() {
@@ -354,10 +354,6 @@ private closeDevicePanel() {
   }
 
   private addPuzzleObject(x: number, y: number, textureKey: string, _color: string) {
-    const g = this.add.graphics()
-    g.lineStyle(1, 0x202a30, 0.4)
-    g.strokeCircle(x, y, INTERACT_DIST)
-
     // Sprite del objeto (reemplaza el emoji placeholder)
     this.add.image(x, y, textureKey)
       .setDisplaySize(68, 48)
@@ -377,7 +373,7 @@ private closeDevicePanel() {
     this.cursors  = kb.createCursorKeys()
     this.keyEnter = kb.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
     this.keyBackspace = kb.addKey(Phaser.Input.Keyboard.KeyCodes.BACKSPACE)
-    this.keyDelete = kb.addKey(Phaser.Input.Keyboard.KeyCodes.DELETE)
+    this.keyP = kb.addKey(Phaser.Input.Keyboard.KeyCodes.P)
   }
   private createWallColliders() {
     this.wallColliders = this.physics.add.staticGroup()

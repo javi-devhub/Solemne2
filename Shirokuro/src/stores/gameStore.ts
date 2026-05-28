@@ -27,6 +27,7 @@ export const useGameStore = defineStore('game', () => {
     currentScene.value = 1
     tension.value = 0
     sessionTime.value = 0
+    
   }
 
   function advanceScene() {

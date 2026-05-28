@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 
 export class Door {
-  private scene:    Phaser.Scene
+  private scene:     Phaser.Scene
   readonly sprite:  Phaser.GameObjects.Sprite
   private obstacle: Phaser.Physics.Arcade.Image | null = null
   private isOpen  = false
@@ -44,19 +44,20 @@ export class Door {
 
     // Desactivar obstáculo físico para que el jugador pueda pasar
     if (this.obstacle) {
-    const body = this.obstacle.body as Phaser.Physics.Arcade.Body | null
+      const body = this.obstacle.body as Phaser.Physics.Arcade.Body | null
 
-    if (body) {
-      body.enable = false
+      if (body) {
+        body.enable = false
+      }
+
+      this.obstacle.setVisible(false)
     }
-
-    this.obstacle.setVisible(false)
-  }
 
     // Flash de luz al desbloquear
     const flash = this.scene.add.rectangle(
       this.sprite.x, this.sprite.y, 220, 160, 0xffffff, 0.35
     ).setDepth(3)
+    
     this.scene.tweens.add({
       targets:  flash,
       alpha:    0,
@@ -76,6 +77,12 @@ export class Door {
       onComplete: () => {
         // Swap de textura: cerrada → abierta (marco igual, vano oscuro)
         this.sprite.setTexture('door-open')
+        
+        // ── MODIFICACIÓN: COMENTAMOS LA TRANSICIÓN AUTOMÁTICA ─────────────
+        // Al quitar esto, evitamos que la pantalla colapse y dejamos que SceneP1 
+        // muestre la pantalla estática 'finpuzzle1.png'.
+        // this.transition()
+        // ──────────────────────────────────────────────────────────────────
       },
     })
   }

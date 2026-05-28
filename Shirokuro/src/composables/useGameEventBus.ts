@@ -23,6 +23,8 @@ type Events = {
   'p1:interact':   InteractEvent
   'p2:interact':   InteractEvent
   'puzzle:solved': string
+  'glitch:trigger': number
+  'screamer:trigger': number
 }
 
 // Singleton — una sola instancia compartida por toda la app

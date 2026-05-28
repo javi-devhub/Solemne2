@@ -3,12 +3,6 @@ import Phaser from 'phaser'
 type Direction = 'down' | 'up' | 'left' | 'right'
 
 // Tamaños de display en unidades de mundo (px).
-// Después del recorte al bounding box los sprites son casi sólo el personaje,
-// así que estos valores ~= tamaño visual real del pj.
-// Ajusta sólo aquí si el pj se ve grande/pequeño.
-// Canvas de todos los sprites: 1536×1024 con el personaje centrado y fondo transparente.
-// Estos valores son el tamaño del CANVAS (no del personaje) para que Phaser
-// escale correctamente y el pj se vea en el tamaño visual deseado.
 const DISPLAY_SIZES: Record<1 | 2, Record<Direction, { w: number; h: number }>> = {
   1: {
     down:  { w: 210, h: 140 },
@@ -65,7 +59,12 @@ export class Player {
     // Hitbox: un poco más estrecha que el display para que no choque con paredes por el pelo
     this.body.setSize(50, 110)
 
-    // Etiqueta J1 / J2
+    this.body.setOffset(
+      (this.body.width - 50) / 2,
+      (this.body.height - 110) / 2 + 40,
+    )
+
+    // Etiqueta J1 / J2 — Inicialmente se renderiza alta
     this.label = scene.add.text(x, y - 48, `J${playerId}`, {
       fontFamily: 'Share Tech Mono',
       fontSize:   '8px',
@@ -93,10 +92,21 @@ export class Player {
     }
   }
 
+  // ── ¡EL CAMBIO RADICAL DE CÓDIGO ESTÁ AQUÍ! ─────────────────────────
   updateLabel() {
     this.label.x = this.body.x
     this.label.y = this.body.y - (this._currentH() / 2) - 6 + this.bobProxy.offset
+
+    // Seteamos el depth dinámico del personaje igual a su posición Y actual.
+    // Usamos la posición inferior (pies) sumándole la mitad del alto real de su colisión
+    // para que el cálculo sea exacto en el suelo.
+    const piesY = this.body.y + 40 
+    this.body.setDepth(piesY)
+    
+    // La etiqueta de texto flotante siempre debe estar una capa por encima de su propia cabeza
+    this.label.setDepth(piesY + 1)
   }
+  // ───────────────────────────────────────────────────────────────────
 
   getPosition() {
     return { x: this.body.x, y: this.body.y }
@@ -141,7 +151,6 @@ export class Player {
     }
   }
 
-  /** Oscilación vertical sutil mientras camina */
   private _startBob() {
     this._stopBob()
     this.walkBobTween = this.scene.tweens.add({
