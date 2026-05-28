@@ -50,3 +50,5 @@
 | Jueves 28 de mayo | Completar documentación, revisar README y DESIGN, verificar repositorio, Dockerfile, pipeline CI/CD, build final y realizar entrega del proyecto. | ☐      |
 
 ---
+
+**Observación:** La priorización MoSCoW fue trabajada como parte de la planificación inicial del proyecto, pero no fue implementada directamente dentro del prototipo. El desarrollo se concentró en concretar las mecánicas principales del juego, como movimiento, inventario, interacción con objetos, mensajes y el primer puzzle cooperativo.
