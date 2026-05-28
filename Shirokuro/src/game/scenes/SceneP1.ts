@@ -343,6 +343,8 @@ export class SceneP1 extends Phaser.Scene {
       'teddy-sprite',
       '#3a3030',
     )
+
+    
   }
 
   private addPuzzleObject(x: number, y: number, textureKey: string, _color: string) {
