@@ -3,7 +3,7 @@ import { Player } from '../objects/Player'
 import { ROOM_01_OBJECTS } from '../data/interactable'
 import { gameBus } from '@/composables/useGameEventBus'
 import { puzzle1State, type TeddyPart } from '../state/puzzle1State'
-import { Door } from '../objects/Door' // Ajusta la ruta de carpetas si es necesario
+import { Door } from '../objects/Door'
 
 const WORLD_W  = 1280
 const WORLD_H  = 720
@@ -13,7 +13,7 @@ const INTERACT_DIST = 80
 
 export class SceneP1 extends Phaser.Scene {
   private player!:  Player
-  private background!: Phaser.GameObjects.Image;
+  private background!: Phaser.GameObjects.Image
   private keyW!:    Phaser.Input.Keyboard.Key
   private keyA!:    Phaser.Input.Keyboard.Key
   private keyS!:    Phaser.Input.Keyboard.Key
@@ -42,18 +42,15 @@ export class SceneP1 extends Phaser.Scene {
     this.load.image('door-open',   '/assets/backgrounds/sprites/door-open.png')
   }
 
-
   create() {
-    // Resetear estado del puzzle al iniciar la escena (nueva partida)
     puzzle1State.reset()
     this.solvedMessageShown = false
 
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H)
     this.buildRoom()
 
-    this.background = this.add.image(640, 360, 'bg-stage1');
-    this.background.texture.setFilter(Phaser.Textures.FilterMode.NEAREST); // Pixel Art nítido
-    this.background.setDepth(-1); // Se dibuja detrás de todo
+    this.background = this.add.image(640, 360, 'bg-stage1')
+    this.background.setDepth(-1)
 
     this.player = new Player(this, 300, FLOOR_Y - 40, 1, WORLD_W, WORLD_H)
     this.createWallColliders()
@@ -61,17 +58,12 @@ export class SceneP1 extends Phaser.Scene {
     this.door = new Door(this, 570, 150, 'door-closed')
     this.physics.add.collider(this.player.body, this.door.sprite)
 
-    this.doorObstacle = this.physics.add.staticImage(640, 135, '') // Sin textura (invisible)
+    this.doorObstacle = this.physics.add.staticImage(640, 135, '')
     this.doorObstacle.setSize(200, 30)
     this.doorObstacle.refreshBody()
     this.doorObstacle.setVisible(false)
     this.door.linkObstacle(this.doorObstacle)
-
     this.physics.add.collider(this.player.body, this.doorObstacle)
-
-    //const floor = this.physics.add.staticImage(WORLD_W / 2, FLOOR_Y + 4, '__DEFAULT')
-    //floor.setDisplaySize(WORLD_W, 8).refreshBody().setAlpha(0)
-    //this.physics.add.collider(this.player.body, floor)
 
     const wallL = this.physics.add.staticImage(0, WORLD_H / 2, '__DEFAULT')
     wallL.setDisplaySize(8, WORLD_H).refreshBody().setAlpha(0)
@@ -88,50 +80,40 @@ export class SceneP1 extends Phaser.Scene {
     this.setupInput()
 
     this.inspectText = this.add.text(320, 620, '', {
-    fontFamily: 'Share Tech Mono',
-    fontSize: '14px',
-    color: '#dddddd',
-   backgroundColor: '#000000',
-    padding: {
-      x: 12,
-      y: 8,
-  },
-})
-  .setOrigin(0.5)
-  .setScrollFactor(0)
-  .setDepth(999)
-  .setVisible(false)
+      fontFamily: 'Share Tech Mono',
+      fontSize: '14px',
+      color: '#dddddd',
+      backgroundColor: '#000000',
+      padding: { x: 12, y: 8 },
+    })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(999)
+      .setVisible(false)
 
-  this.createTeddyPanel()
+    this.createTeddyPanel()
 
-    // Tecla E — interactuar
-  this.keyE.on('down', () => this.tryInteract())
- }
+    this.keyE.on('down', () => this.tryInteract())
+  }
 
   update() {
-
     if (this.isPuzzlePanelOpen) {
-    this.handleTeddyPanelInput()
-    this.player.moveFree(0, 0)
-    this.player.updateLabel()
-    return
-  }
+      this.handleTeddyPanelInput()
+      this.player.moveFree(0, 0)
+      this.player.updateLabel()
+      return
+    }
+
     let vx = 0
     let vy = 0
     if (this.keyA.isDown) vx = -SPEED
     if (this.keyD.isDown) vx =  SPEED
     if (this.keyW.isDown) vy = -SPEED
-    if (this.keyS.isDown) vy = SPEED
+    if (this.keyS.isDown) vy =  SPEED
     this.player.moveFree(vx, vy)
-
-    if (Phaser.Input.Keyboard.JustDown(this.keyW)) {
-    
-  }
-
     this.player.updateLabel()
-
     this.checkProximity()
-}
+  }
 
   private checkProximity() {
     const { x, y } = this.player.getPosition()
@@ -144,11 +126,9 @@ export class SceneP1 extends Phaser.Scene {
     }
 
     if (nearest) {
-      // Convertir coordenadas mundo → pantalla (mitad izquierda)
-      const cam   = this.cameras.main
-      const sx    = (nearest.x - cam.scrollX) * cam.zoom
-      const sy    = (nearest.y - cam.scrollY) * cam.zoom - 40
-
+      const cam = this.cameras.main
+      const sx  = (nearest.x - cam.scrollX) * cam.zoom
+      const sy  = (nearest.y - cam.scrollY) * cam.zoom - 40
       gameBus.emit('p1:proximity', {
         objectId: nearest.id,
         prompt:   nearest.promptP1,
@@ -161,15 +141,16 @@ export class SceneP1 extends Phaser.Scene {
   }
 
   private tryInteract() {
+    if (this.isPuzzlePanelOpen) return
+
     const { x, y } = this.player.getPosition()
     for (const obj of ROOM_01_OBJECTS) {
       const dist = Phaser.Math.Distance.Between(x, y, obj.x, obj.y)
       if (dist < INTERACT_DIST) {
-        const cam  = this.cameras.main
-        const sx   = (obj.x - cam.scrollX) * cam.zoom
-        const sy   = (obj.y - cam.scrollY) * cam.zoom - 60
+        const cam = this.cameras.main
+        const sx  = (obj.x - cam.scrollX) * cam.zoom
+        const sy  = (obj.y - cam.scrollY) * cam.zoom - 60
 
-        console.log('J1 inspeccionó:', obj.descriptionP1)
         this.showInspectMessage(obj.descriptionP1)
         this.openTeddyPanel()
 
@@ -184,58 +165,48 @@ export class SceneP1 extends Phaser.Scene {
       }
     }
   }
+
   private showInspectMessage(message: string) {
     this.inspectText.setText(message)
     this.inspectText.setVisible(true)
 
     if (this.inspectTextTimer) {
-    this.inspectTextTimer.remove(false)
+      this.inspectTextTimer.remove(false)
+    }
+
+    this.inspectTextTimer = this.time.delayedCall(3000, () => {
+      this.inspectText.setVisible(false)
+    })
   }
 
-  this.inspectTextTimer = this.time.delayedCall(3000, () => {
-    this.inspectText.setVisible(false)
-  })
-
-}
   private createTeddyPanel() {
-  const panelBg = this.add.rectangle(320, 280, 440, 340, 0x050505, 0.95)
-    .setStrokeStyle(1, 0x444444)
+    const panelBg = this.add.rectangle(320, 280, 440, 340, 0x050505, 0.95)
+      .setStrokeStyle(1, 0x444444)
 
-  this.teddyPanelText = this.add.text(320, 280, '', {
-    fontFamily: 'Share Tech Mono',
-    fontSize: '12px',
-    color: '#dddddd',
-    align: 'left',
-    lineSpacing: 3,
-    wordWrap: {
-      width: 390,
-    },
-  }).setOrigin(0.5)
+    this.teddyPanelText = this.add.text(320, 280, '', {
+      fontFamily: 'Share Tech Mono',
+      fontSize: '12px',
+      color: '#dddddd',
+      align: 'left',
+      lineSpacing: 3,
+      wordWrap: { width: 390 },
+    }).setOrigin(0.5)
 
-  this.teddyPanel = this.add.container(0, 0, [
-    panelBg,
-    this.teddyPanelText,
-  ])
+    this.teddyPanel = this.add.container(0, 0, [panelBg, this.teddyPanelText])
+    this.teddyPanel.setScrollFactor(0).setDepth(1000).setVisible(false)
+  }
 
-  this.teddyPanel
-    .setScrollFactor(0)
-    .setDepth(1000)
-    .setVisible(false)
-}
+  private openTeddyPanel() {
+    this.isPuzzlePanelOpen = true
+    this.refreshTeddyPanel()
+    this.teddyPanel.setVisible(true)
+  }
 
-private openTeddyPanel() {
-  this.isPuzzlePanelOpen = true
-  this.refreshTeddyPanel()
-  this.teddyPanel.setVisible(true)
-}
+  private refreshTeddyPanel() {
+    const selectedPart = this.teddyParts[this.teddySelectedIndex]
 
-private refreshTeddyPanel() {
-  const selectedPart = this.teddyParts[this.teddySelectedIndex]
-
-  // Estado final: J2 ya confirmó → ambas puertas abiertas
-  if (puzzle1State.solved) {
-    this.teddyPanelText.setText(
-      [
+    if (puzzle1State.solved) {
+      this.teddyPanelText.setText([
         '[ OSITO COSIDO ]',
         '',
         'El osito dejó de temblar.',
@@ -246,15 +217,12 @@ private refreshTeddyPanel() {
         'La puerta se abrió.',
         '',
         'Q: cerrar',
-      ].join('\n'),
-    )
-    return
-  }
+      ].join('\n'))
+      return
+    }
 
-  // J1 completó la secuencia, esperando que J2 confirme
-  if (puzzle1State.sequenceComplete) {
-    this.teddyPanelText.setText(
-      [
+    if (puzzle1State.sequenceComplete) {
+      this.teddyPanelText.setText([
         '[ OSITO COSIDO ]',
         '',
         'El osito quedó quieto.',
@@ -266,13 +234,11 @@ private refreshTeddyPanel() {
         'desde su dispositivo.',
         '',
         'Q: cerrar',
-      ].join('\n'),
-    )
-    return
-  }
+      ].join('\n'))
+      return
+    }
 
-  this.teddyPanelText.setText(
-    [
+    this.teddyPanelText.setText([
       '[ OSITO COSIDO ]',
       '',
       'El osito tiene partes sueltas.',
@@ -288,81 +254,102 @@ private refreshTeddyPanel() {
       'A / D: cambiar parte',
       'E: girar parte',
       'Q: cerrar',
-    ].join('\n'),
-  )
-}
+    ].join('\n'))
+  }
 
-private handleTeddyPanelInput() {
-  if (Phaser.Input.Keyboard.JustDown(this.keyA)) {
-    this.teddySelectedIndex--
-    if (this.teddySelectedIndex < 0) {
-      this.teddySelectedIndex = this.teddyParts.length - 1
+  private handleTeddyPanelInput() {
+    if (Phaser.Input.Keyboard.JustDown(this.keyA)) {
+      this.teddySelectedIndex--
+      if (this.teddySelectedIndex < 0) {
+        this.teddySelectedIndex = this.teddyParts.length - 1
+      }
+      this.refreshTeddyPanel()
     }
-    this.refreshTeddyPanel()
-  }
 
-  if (Phaser.Input.Keyboard.JustDown(this.keyD)) {
-    this.teddySelectedIndex++
-    if (this.teddySelectedIndex >= this.teddyParts.length) {
-      this.teddySelectedIndex = 0
+    if (Phaser.Input.Keyboard.JustDown(this.keyD)) {
+      this.teddySelectedIndex++
+      if (this.teddySelectedIndex >= this.teddyParts.length) {
+        this.teddySelectedIndex = 0
+      }
+      this.refreshTeddyPanel()
     }
-    this.refreshTeddyPanel()
+
+    if (Phaser.Input.Keyboard.JustDown(this.keyE)) {
+      const selectedPart = this.teddyParts[this.teddySelectedIndex]
+      const result = puzzle1State.rotatePart(selectedPart)
+      this.showInspectMessage(result.messageP1)
+      this.refreshTeddyPanel()
+
+      if (result.ok === false) {
+        this.triggerGlitch()
+      }
+    }
+
+    if (puzzle1State.solved && !this.solvedMessageShown) {
+      this.solvedMessageShown = true
+      this.showInspectMessage('¡Confirmado! La puerta se desbloqueó.')
+      this.door.open()
+    }
+
+    if (Phaser.Input.Keyboard.JustDown(this.keyQ)) {
+      this.closeTeddyPanel()
+    }
   }
 
-  if (Phaser.Input.Keyboard.JustDown(this.keyE)) {
-    const selectedPart = this.teddyParts[this.teddySelectedIndex]
-    const result = puzzle1State.rotatePart(selectedPart)
-    this.showInspectMessage(result.messageP1)
-    this.refreshTeddyPanel()
-  }
+  private triggerGlitch() {
+    const cam = this.cameras.main
+    let count = 0
 
-  // Abrir puerta J1 solo cuando puzzle1State.solved (J2 ya confirmó)
-  if (puzzle1State.solved && !this.solvedMessageShown) {
-    this.solvedMessageShown = true
-    this.showInspectMessage('¡Confirmado! La puerta se desbloqueó.')
-    this.door.open()
+    this.time.addEvent({
+      delay: 50,
+      repeat: 10,
+      callback: () => {
+        count++
+        if (count % 2 === 0) {
+          cam.setScroll(
+            cam.scrollX + Phaser.Math.Between(-6, 6),
+            cam.scrollY + Phaser.Math.Between(-3, 3),
+          )
+          cam.setAlpha(0.7)
+        } else {
+          cam.setAlpha(1)
+        }
+        if (count >= 10) {
+          cam.setAlpha(1)
+        }
+      },
+    })
   }
-
-  if (Phaser.Input.Keyboard.JustDown(this.keyQ)) {
-    this.closeTeddyPanel()
-  }
-}
 
   private closeTeddyPanel() {
     this.isPuzzlePanelOpen = false
     this.teddyPanel.setVisible(false)
-}
+  }
 
   private buildRoom() {
-    //this.add.rectangle(0, 0, WORLD_W, WORLD_H, 0x060606).setOrigin(0, 0)
-    const floorY = FLOOR_Y
-    //this.add.rectangle(0, floorY, WORLD_W, WORLD_H - floorY, 0x0a0a0a).setOrigin(0, 0)
-    //this.add.line(0, 0, 0, floorY, WORLD_W, floorY, 0x1e1e1e).setLineWidth(1).setOrigin(0, 0)
     this.add.rectangle(0, 0, 4, WORLD_H, 0x1a1a1a).setOrigin(0, 0)
     this.add.rectangle(WORLD_W - 4, 0, 4, WORLD_H, 0x1a1a1a).setOrigin(0, 0)
 
     this.add.text(16, 18, 'HABITACIÓN 01', {
-      fontFamily: 'Share Tech Mono', fontSize: '10px',
-      color: '#1e1e1e', letterSpacing: 5,
+      fontFamily: 'Share Tech Mono',
+      fontSize: '10px',
+      color: '#1e1e1e',
+      letterSpacing: 5,
     }).setOrigin(0, 0).setScrollFactor(0).setDepth(1)
 
-    // Objeto central del puzzle — J1 lo ve como osito
     this.addPuzzleObject(
       ROOM_01_OBJECTS[0].x,
       ROOM_01_OBJECTS[0].y,
-      'teddy-sprite', '#3a3030'
+      'teddy-sprite',
+      '#3a3030',
     )
-
-    
   }
 
   private addPuzzleObject(x: number, y: number, textureKey: string, _color: string) {
-    // Círculo de interacción (radio visual)
     const g = this.add.graphics()
     g.lineStyle(1, 0x2a2020, 0.4)
     g.strokeCircle(x, y, INTERACT_DIST)
 
-    // Sprite del objeto (reemplaza el emoji placeholder)
     this.add.image(x, y, textureKey)
       .setDisplaySize(68, 48)
       .setOrigin(0.5)
@@ -383,52 +370,47 @@ private handleTeddyPanelInput() {
     this.keyS = kb.addKey(Phaser.Input.Keyboard.KeyCodes.S)
     this.keyD = kb.addKey(Phaser.Input.Keyboard.KeyCodes.D)
     this.keyE = kb.addKey(Phaser.Input.Keyboard.KeyCodes.E)
-    this.keyQ= kb.addKey(Phaser.Input.Keyboard.KeyCodes.Q)
+    this.keyQ = kb.addKey(Phaser.Input.Keyboard.KeyCodes.Q)
   }
 
   private createWallColliders() {
-  this.wallColliders = this.physics.add.staticGroup()
+    this.wallColliders = this.physics.add.staticGroup()
 
     const thickness = 24
-
-    const LEFT = 250
-    const RIGHT = 1020
-    const TOP = 215
+    const LEFT   = 250
+    const RIGHT  = 1020
+    const TOP    = 215
     const BOTTOM = 645
 
     const centerX = (LEFT + RIGHT) / 2
     const centerY = (TOP + BOTTOM) / 2
-    const width = RIGHT - LEFT
-    const height = BOTTOM - TOP
+    const width   = RIGHT - LEFT
+    const height  = BOTTOM - TOP
 
-  // Pared superior
-  this.wallColliders
-    .create(centerX, TOP, '__DEFAULT')
-    .setDisplaySize(width, thickness)
-    .setAlpha(0.3)
-    .refreshBody()
+    this.wallColliders
+      .create(centerX, TOP, '__DEFAULT')
+      .setDisplaySize(width, thickness)
+      .setAlpha(0.3)
+      .refreshBody()
 
-  // Pared inferior
-  this.wallColliders
-    .create(centerX, BOTTOM, '__DEFAULT')
-    .setDisplaySize(width, thickness)
-    .setAlpha(0.3)
-    .refreshBody()
+    this.wallColliders
+      .create(centerX, BOTTOM, '__DEFAULT')
+      .setDisplaySize(width, thickness)
+      .setAlpha(0.3)
+      .refreshBody()
 
-  // Pared izquierda
-  this.wallColliders
-    .create(LEFT, centerY, '__DEFAULT')
-    .setDisplaySize(thickness, height)
-    .setAlpha(0.3)
-    .refreshBody()
+    this.wallColliders
+      .create(LEFT, centerY, '__DEFAULT')
+      .setDisplaySize(thickness, height)
+      .setAlpha(0.3)
+      .refreshBody()
 
-  // Pared derecha
-  this.wallColliders
-    .create(RIGHT, centerY, '__DEFAULT')
-    .setDisplaySize(thickness, height)
-    .setAlpha(0.3)
-    .refreshBody()
+    this.wallColliders
+      .create(RIGHT, centerY, '__DEFAULT')
+      .setDisplaySize(thickness, height)
+      .setAlpha(0.3)
+      .refreshBody()
 
-  this.physics.add.collider(this.player.body, this.wallColliders)
+    this.physics.add.collider(this.player.body, this.wallColliders)
   }
 }

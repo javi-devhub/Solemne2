@@ -51,6 +51,7 @@ export class Player {
     // Textura inicial: de frente (down)
     this.body = scene.physics.add.image(x, y, `player${playerId}-down`)
     this._applyDisplaySize('down')
+    this.body.setCollideWorldBounds(true)
 
     // Pixel Art nítido
     if (this.body.texture) {
@@ -64,6 +65,10 @@ export class Player {
 
     // Hitbox: un poco más estrecha que el display para que no choque con paredes por el pelo
     this.body.setSize(50, 110)
+    this.body.setOffset(
+      (this.body.width - 50) / 2,
+      (this.body.height - 110) / 2 + 40,
+    )
 
     // Etiqueta J1 / J2
     this.label = scene.add.text(x, y - 48, `J${playerId}`, {
