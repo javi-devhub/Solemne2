@@ -71,3 +71,15 @@ jobs:
       - name: Build Docker image
         working-directory: Shirokuro
         run: docker build -t shirokuro .
+
+      - name: Login to Docker Hub
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u dedlis --password-stdin
+
+      - name: Push to Docker Hub
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          docker tag shirokuro dedlis/shirokuro:latest
+          docker tag shirokuro dedlis/shirokuro:v1.2
+          docker push dedlis/shirokuro:latest
+          docker push dedlis/shirokuro:v1.2
