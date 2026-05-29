@@ -108,7 +108,11 @@ http://localhost:8080
 ```
 ### Ejecutar desde Docker Hub
 
+https://hub.docker.com/r/dedlis/shirokuro
+
 También se puede ejecutar el proyecto descargando la imagen publicada en Docker Hub:
+
+
 
 ```bash
 docker pull dedlis/shirokuro:v1.1
