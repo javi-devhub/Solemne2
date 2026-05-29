@@ -47,7 +47,7 @@
 
 | Día               | Actividad planificada                                                                                                                             | Estado |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| Jueves 28 de mayo | Completar documentación, revisar README y DESIGN, verificar repositorio, Dockerfile, pipeline CI/CD, build final y realizar entrega del proyecto. | ☐      |
+| Jueves 28 de mayo | Completar documentación, revisar README y DESIGN, verificar repositorio, Dockerfile, pipeline CI/CD, build final y realizar entrega del proyecto. | ✔      |
 
 ---
 
