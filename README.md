@@ -115,8 +115,8 @@ También se puede ejecutar el proyecto descargando la imagen publicada en Docker
 
 
 ```bash
-docker pull dedlis/shirokuro:v1.1
-docker run -p 8080:80 dedlis/shirokuro:v1.1
+docker pull dedlis/shirokuro:v1.2
+docker run -p 8080:80 dedlis/shirokuro:v1.2
 ```
 Abrir en el navegador:
 
