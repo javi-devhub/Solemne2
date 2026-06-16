@@ -371,7 +371,7 @@ El consumo se realizará exclusivamente desde el backend para proteger la clave 
 
 ### Ciudad por defecto: Bergen, Noruega
 
-Bergen es una ciudad reconocida por su clima lluvioso, sus pocas horas de luz durante el invierno y su relación con el ambiente nórdico.
+Bergen es una ciudad reconocida por su clima lluvioso, sus pocas horas de luz durante el invierno.
 
 Esta elección refuerza la atmósfera de terror psicológico y desorientación del juego.
 
@@ -398,6 +398,6 @@ rain | thunderstorm | mist
 | Condición meteorológica | Efecto en el juego                                                                                                                                                               |
 | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `rain`                  | Sonido ambiental de lluvia                                                                                                                                                       |
-| `thunderstorm`          | Parpadeos de luz y sonido de truenos. Durante el segundo puzzle podrá aumentar ligeramente la velocidad con la que avanza la sombra, pero no generará screamers fuera del puzzle |
+| `thunderstorm`          | Parpadeos de luz y sonido de truenos.|
 | `mist` / `fog`          | Reducción del campo de visión de ambos jugadores                                                                                                                                 |
 | Otras condiciones       | Ambiente normal sin modificaciones adicionales                                                                                                                                   |
