@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: Shirokuro
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v4
 
