@@ -289,7 +289,7 @@ Authorization: Bearer <token>
 | ------ | -------------- | ----------------------------------------------- | ---- |
 | GET    | `/api/weather` | Retorna el clima actual procesado para el juego | No   |
 
-### Organización de carpetas actualizada
+### Organización de carpetas 
 
 ```text
 proyecto-juego/
@@ -330,6 +330,26 @@ proyecto-juego/
 │
 └── compose.yml
 ```
+# Flujo general del juego
+
+Pantalla inicial
+↓
+Registro o login
+↓
+Menú principal
+↓
+Nueva partida o continuar partida
+↓
+Pantalla de instrucciones (solo al iniciar una nueva partida)
+↓
+Gameplay
+↓
+Primer puzzle
+↓
+Segundo puzzle cooperativo
+↓
+Pantalla de cierre o mensaje de “Continuará”
+
 
 ## Integración con servicio REST externo
 
