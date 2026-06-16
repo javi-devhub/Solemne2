@@ -370,7 +370,7 @@ El backend procesará la respuesta de OpenWeatherMap y la transformará en un ob
 Los valores posibles para `condition` serán:
 
 ```text
-rain | clear | clouds | snow | thunderstorm | mist
+rain | thunderstorm | mist
 ```
 
 ### Efectos en el juego
