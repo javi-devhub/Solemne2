@@ -211,7 +211,7 @@ Al iniciar sesión, el juego ofrecerá continuar desde el último punto guardado
 │  Vue 3 + Phaser     │◄──────►│  Node.js + Express   │◄──────►│             │
 │  TypeScript + Pinia │        │  API REST + JWT      │        │             │
 └─────────────────────┘        └──────────┬───────────┘        └─────────────┘
-                                         │ HTTP
+                                         │ HTTP REST
                                          ▼
                               ┌──────────────────────┐
                               │ OpenWeatherMap API   │
