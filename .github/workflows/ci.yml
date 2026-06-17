@@ -70,7 +70,7 @@ jobs:
 
       - name: Build Docker image
         working-directory: frontend
-        run: docker build -t frontend .
+        run: docker build -t shirokuro .
 
 
       - name: Login to Docker Hub
