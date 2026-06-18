@@ -194,8 +194,8 @@ Una vez resuelto el puzzle, la sombra desaparece. Este sistema reemplaza la apar
 ### Pantallas de autenticación
 
 * **Registro:** formulario con nombre de usuario, correo y contraseña.
-* **Login:** formulario con correo y contraseña. Generará un token JWT que se almacenará en el cliente.
-* **Sesión persistente:** el token JWT se almacenará temporalmente en `localStorage` y se enviará en las solicitudes autenticadas al backend. Al cerrar sesión, el token será eliminado.
+* **Login:** formulario con correo y contraseña. Si las credenciales son correctas, el backend generará un token JWT y lo almacenará en una cookie HttpOnly.
+* **Sesión persistente:** después del login, el backend generará un token JWT y lo enviará mediante una cookie HttpOnly. El navegador incluirá automáticamente esta cookie en las solicitudes autenticadas al backend. Al cerrar sesión, el backend eliminará la cookie.
 
 ### Guardado y recuperación de progreso
 
