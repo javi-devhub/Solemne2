@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, type InferSchemaType } from 'mongoose';
 
 const userSchema = new Schema(
   {
@@ -6,6 +6,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       trim: true,
+      minlength: 3,
     },
     email: {
       type: String,
@@ -23,5 +24,7 @@ const userSchema = new Schema(
     timestamps: true,
   },
 );
+
+export type UserDocument = InferSchemaType<typeof userSchema>;
 
 export const User = mongoose.model('User', userSchema);
