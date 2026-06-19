@@ -207,11 +207,11 @@ Al iniciar sesión, el juego ofrecerá continuar desde el último punto guardado
 
 ```text
 ┌─────────────────────┐        ┌──────────────────────┐        ┌─────────────┐
-│     Frontend        │  HTTP  │      Backend         │Mongoose│   MongoDB   │
+│     Frontend        │  HTTP  │      Backend         │        │   MongoDB   │
 │  Vue 3 + Phaser     │◄──────►│  Node.js + Express   │◄──────►│             │
-│  TypeScript + Pinia │        │  API REST + JWT      │        │             │
+│   + Pinia │         │        |        + JWT         │        │             │
 └─────────────────────┘        └──────────┬───────────┘        └─────────────┘
-                                         │ HTTP REST
+                                         │ 
                                          ▼
                               ┌──────────────────────┐
                               │ OpenWeatherMap API   │
@@ -272,7 +272,7 @@ Authorization: Bearer <token>
 | Método | Endpoint             | Descripción                                                 | Auth |
 | ------ | -------------------- | ----------------------------------------------------------- | ---- |
 | POST   | `/api/auth/register` | Registro de nuevo usuario                                   | No   |
-| POST   | `/api/auth/login`    | Login, retorna JWT                                          | No   |
+| POST   | `/api/auth/login`    | Login                                                       | No   |
 | GET    | `/api/auth/me`       | Obtiene los datos del usuario autenticado mediante su token | JWT  |
 
 #### Progreso
