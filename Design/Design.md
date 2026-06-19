@@ -206,8 +206,8 @@ Al iniciar sesión, el juego ofrecerá continuar desde el último punto guardado
 ## Arquitectura fullstack
 
 ```text
-┌─────────────────────┐        ┌──────────────────────┐        ┌─────────────┐
-│     Frontend        │  HTTP  │      Backend         │        │   MongoDB   │
+┌─────────────────────┐ cookie ┌──────────────────────┐        ┌─────────────┐
+│     Frontend        │HTTPOnly│      Backend         │        │   MongoDB   │
 │  Vue 3 + Phaser     │◄──────►│  Node.js + Express   │◄──────►│             │
 │   + Pinia │         │        |        + JWT         │        │             │
 └─────────────────────┘        └──────────┬───────────┘        └─────────────┘
