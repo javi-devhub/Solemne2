@@ -5,6 +5,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 
 import authRoutes from './routes/auth';
+import mongoose from 'mongoose';
 
 dotenv.config();
 
