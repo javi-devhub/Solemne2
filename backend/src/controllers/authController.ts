@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import type { AuthenticatedRequest } from '../middlewares/authMiddleware';
 
 import { User } from '../models/User';
 
@@ -11,7 +12,6 @@ export const registerUser = async (
   try {
     const { username, email, password } = req.body;
 
-    // Verifica que se enviaron todos los datos
     if (!username || !email || !password) {
       res.status(400).json({
         message: 'Nombre, correo y contraseña son obligatorios',
@@ -19,10 +19,8 @@ export const registerUser = async (
       return;
     }
 
-    // Normaliza el correo antes de buscarlo
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Comprueba si el correo ya está registrado
     const existingUser = await User.findOne({
       email: normalizedEmail,
     });
@@ -34,17 +32,14 @@ export const registerUser = async (
       return;
     }
 
-    // Protege la contraseña antes de guardarla
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Guarda el usuario en MongoDB
     const newUser = await User.create({
       username,
       email: normalizedEmail,
       passwordHash,
     });
 
-    // Devuelve los datos públicos del usuario
     res.status(201).json({
       message: 'Usuario registrado correctamente',
       user: {
@@ -82,6 +77,9 @@ export const loginUser = async (
       email: normalizedEmail,
     });
 
+
+
+
     if (!user) {
       res.status(401).json({
         message: 'Correo o contraseña incorrectos',
@@ -89,6 +87,9 @@ export const loginUser = async (
       return;
     }
 
+
+
+    
     const passwordIsValid = await bcrypt.compare(
       password,
       user.passwordHash,
@@ -118,9 +119,15 @@ export const loginUser = async (
       },
     );
 
+    res.cookie('authToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 2 * 60 * 60 * 1000,
+    });
+
     res.status(200).json({
       message: 'Login correcto',
-      token,
       user: {
         id: user._id,
         username: user.username,
@@ -129,6 +136,39 @@ export const loginUser = async (
     });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
+
+    res.status(500).json({
+      message: 'Error interno del servidor',
+    });
+  }
+};
+
+export const getCurrentUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({
+        message: 'No autenticado',
+      });
+      return;
+    }
+
+    const user = await User.findById(req.user.userId).select('-passwordHash');
+
+    if (!user) {
+      res.status(404).json({
+        message: 'Usuario no encontrado',
+      });
+      return;
+    }
+
+    res.status(200).json({
+      user,
+    });
+  } catch (error) {
+    console.error('Error al obtener usuario actual:', error);
 
     res.status(500).json({
       message: 'Error interno del servidor',

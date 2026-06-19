@@ -62,7 +62,7 @@
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
 | Lunes 15/06  | Desarrollar la segunda parte del `PLANNING.md` y subirla al repositorio, dividir el proyecto en frontend y backend, actualizar el `DESIGN.md`, definir la ruta del juego, definir para qué se utilizarán los modelos de datos y establecer las mejoras que se realizarán en el juego. | ✔      |
 | Martes 16/06 | Crear la estructura base del backend e implementar los endpoints iniciales para el registro y login de usuarios.                                                                                                                                                                      | ✔      |
-| Jueves 18/06 | Conectar el backend con MongoDB, crear el modelo de usuario y comprobar el funcionamiento del registro y login. Confirmar la integración de OpenWeatherMap y documentar en `DESIGN.md` el endpoint consumido y su funcionalidad dentro del juego.                                     | ☐      |
+| Jueves 18/06 | Conectar el backend con MongoDB, crear el modelo de usuario y comprobar el funcionamiento del registro y login. Confirmar la integración de OpenWeatherMap y documentar en `DESIGN.md` el endpoint consumido y su funcionalidad dentro del juego.                                     | ✔      |
 
 ## Semana 2
 
