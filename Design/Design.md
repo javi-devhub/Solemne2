@@ -224,7 +224,7 @@ Al iniciar sesión, el juego ofrecerá continuar desde el último punto guardado
 | Categoría        | Dependencia        | Propósito                                                              |
 | ---------------- | ------------------ | ---------------------------------------------------------------------- |
 | Runtime backend  | Node.js + Express  | Servidor HTTP que expone la API REST                                   |
-| Base de datos    | MongoDB + Mongoose | Persistencia de usuarios y progreso de partidas                        |
+| Base de datos    | Mongoose | Persistencia de usuarios y progreso de partidas                        |
 | Autenticación    | JWT + bcrypt       | Generación de tokens y hash seguro de contraseñas                      |
 | Servicio externo | OpenWeatherMap API | Obtención del clima real para aplicar efectos de atmósfera en el juego |
 | Testing backend  | Jest               | Pruebas unitarias de los endpoints y lógica del servidor               |
