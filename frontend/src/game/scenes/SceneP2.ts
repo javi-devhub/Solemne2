@@ -4,12 +4,14 @@ import { ROOM_01_OBJECTS } from '../data/interactable'
 import { gameBus } from '@/composables/useGameEventBus'
 import { puzzle1State } from '../state/puzzle1State'
 import { Door } from '../objects/Door'
+import { DebugHitboxes } from '../objects/DebugHitboxes'
+import { findNearestInteractable } from '../utils/proximity'
 
 const WORLD_W       = 1280
 const WORLD_H       = 720
 const SPEED         = 180
 const FLOOR_Y       = WORLD_H * 0.72
-const INTERACT_DIST = 80
+const INTERACT_MARGIN = 48 // distancia máxima desde el BORDE del objeto, no desde su centro
 
 export class SceneP2 extends Phaser.Scene {
   private player!:    Player
@@ -18,6 +20,8 @@ export class SceneP2 extends Phaser.Scene {
   private keyEnter!:  Phaser.Input.Keyboard.Key
   private keyBackspace!: Phaser.Input.Keyboard.Key
   private wallColliders!: Phaser.Physics.Arcade.StaticGroup
+  private furnitureColliders!: Phaser.Physics.Arcade.StaticGroup
+  private debugHitboxes!: DebugHitboxes
   private keyP!: Phaser.Input.Keyboard.Key
 
   private devicePanel!: Phaser.GameObjects.Container
@@ -82,6 +86,7 @@ export class SceneP2 extends Phaser.Scene {
     this.physics.add.collider(this.player.body, wallL)
     this.physics.add.collider(this.player.body, wallR)
     this.createWallColliders()
+    this.createFurnitureColliders()
 
     this.cameras.main.setViewport(640, 0, 640, 720)
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H)
@@ -106,6 +111,12 @@ export class SceneP2 extends Phaser.Scene {
   .setVisible(false)
     this.createDevicePanel()
     this.keyP.on('down', () => this.tryInteract())
+
+    // ── Debug visual de hitboxes (F1 para activar/desactivar) ───────────
+    this.debugHitboxes = new DebugHitboxes(this)
+    this.debugHitboxes.trackStaticGroup(this.wallColliders, 0xff0000)      // paredes: rojo
+    this.debugHitboxes.trackStaticGroup(this.furnitureColliders, 0xff8800) // muebles: naranja
+    this.debugHitboxes.trackInteractables(ROOM_01_OBJECTS, 0x00ff00)       // interactuables: verde
   }
 
   update() {
@@ -115,6 +126,8 @@ export class SceneP2 extends Phaser.Scene {
       this.door2Solved = true
       this.door2.open()
     }
+
+    this.debugHitboxes.refresh()
 
     if (this.isDevicePanelOpen) {
     if (Phaser.Input.Keyboard.JustDown(this.keyEnter)) {
@@ -147,13 +160,7 @@ export class SceneP2 extends Phaser.Scene {
 
   private checkProximity() {
     const { x, y } = this.player.getPosition()
-    let nearest: typeof ROOM_01_OBJECTS[0] | null = null
-    let minDist = INTERACT_DIST
-
-    for (const obj of ROOM_01_OBJECTS) {
-      const dist = Phaser.Math.Distance.Between(x, y, obj.x, obj.y)
-      if (dist < minDist) { minDist = dist; nearest = obj }
-    }
+    const nearest = findNearestInteractable(x, y, ROOM_01_OBJECTS, INTERACT_MARGIN)
 
     if (nearest) {
       const cam = this.cameras.main
@@ -173,28 +180,24 @@ export class SceneP2 extends Phaser.Scene {
 
   private tryInteract() {
     const { x, y } = this.player.getPosition()
-    for (const obj of ROOM_01_OBJECTS) {
-      const dist = Phaser.Math.Distance.Between(x, y, obj.x, obj.y)
-      if (dist < INTERACT_DIST) {
-        const cam = this.cameras.main
-        const sx  = 640 + (obj.x - cam.scrollX) * cam.zoom
-        const sy  = (obj.y - cam.scrollY) * cam.zoom - 60
+    const obj = findNearestInteractable(x, y, ROOM_01_OBJECTS, INTERACT_MARGIN)
+    if (!obj) return
 
-        console.log('J2 inspeccionó:', obj.descriptionP2)
-        this.showInspectMessage(obj.descriptionP2)
-        this.openDevicePanel()
-        
+    const cam = this.cameras.main
+    const sx  = 640 + (obj.x - cam.scrollX) * cam.zoom
+    const sy  = (obj.y - cam.scrollY) * cam.zoom - 60
 
-        gameBus.emit('p2:interact', {
-          objectId:    obj.id,
-          description: obj.descriptionP2,
-          actions:     obj.actions ?? [],
-          screenX:     sx,
-          screenY:     sy,
-        })
-        return
-      }
-    }
+    console.log('J2 inspeccionó:', obj.descriptionP2)
+    this.showInspectMessage(obj.descriptionP2)
+    this.openDevicePanel()
+
+    gameBus.emit('p2:interact', {
+      objectId:    obj.id,
+      description: obj.descriptionP2,
+      actions:     obj.actions ?? [],
+      screenX:     sx,
+      screenY:     sy,
+    })
   }
 
   private showInspectMessage(message: string) {
@@ -329,6 +332,35 @@ private closeDevicePanel() {
   this.devicePanel.setVisible(false)
 }
 
+
+  /**
+   * Obstáculos físicos puramente decorativos: camilla, banquitos, carrito,
+   * base de la lámpara y mesitas. Solo bloquean el paso — no son interactuables.
+   * Coordenadas estimadas sobre bg-stage1-j2; calibrar con F1 (DebugHitboxes) contra el fondo real.
+   */
+  private createFurnitureColliders() {
+    this.furnitureColliders = this.physics.add.staticGroup()
+
+    const muebles = [
+      { x: 155, y: 350, w: 110, h: 260 }, // carrito con cortina + mesita izquierda
+      { x: 355, y: 390, w: 40,  h: 56 },  // banquito izquierdo
+      { x: 625, y: 380, w: 145, h: 180 }, // camilla central
+      { x: 730, y: 405, w: 40,  h: 56 },  // banquito derecho
+      { x: 905, y: 345, w: 50,  h: 70 },  // base de la lámpara (no el brazo colgante)
+      { x: 1065, y: 200, w: 100, h: 70 }, // mesita con monitor
+      { x: 1075, y: 440, w: 100, h: 120 }, // carrito con bandeja
+    ]
+
+    for (const m of muebles) {
+      this.furnitureColliders
+        .create(m.x, m.y, '__DEFAULT')
+        .setDisplaySize(m.w, m.h)
+        .setAlpha(0)
+        .refreshBody()
+    }
+
+    this.physics.add.collider(this.player.body, this.furnitureColliders)
+  }
 
   private buildRoom() {
     //this.add.rectangle(0, 0, WORLD_W, WORLD_H, 0x060606).setOrigin(0, 0)
