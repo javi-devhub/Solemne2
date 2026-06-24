@@ -4,8 +4,8 @@ import {
   getCurrentUser,
   loginUser,
   registerUser,
-} from '../controllers/authController';
-import { authenticateUser } from '../middlewares/authMiddleware';
+} from '../controllers/authController.js';
+import { authenticateUser } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 
