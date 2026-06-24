@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import type { AuthenticatedRequest } from '../middlewares/authMiddleware';
+import type { AuthenticatedRequest } from '../middlewares/authMiddleware.js';
 
-import { User } from '../models/User';
+import { User } from '../models/User.js';
 
 export const registerUser = async (
   req: Request,
