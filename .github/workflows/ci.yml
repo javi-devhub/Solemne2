@@ -68,6 +68,22 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Levantar Docker Compose
+        working-directory: .
+        run: docker compose -f compose.yml up -d --build
+
+      - name: Esperar backend
+        run: sleep 15
+
+      - name: Probar backend health
+        working-directory: .
+        run: curl http://localhost:3001/api/health
+
+      - name: Apagar Docker Compose
+        if: always()
+        working-directory: .
+        run: docker compose -f compose.yml down
+
       - name: Build Docker image
         working-directory: frontend
         run: docker build -t shirokuro .
