@@ -62,27 +62,9 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   create() {
-    // Lanzar ambas escenas de jugador + HUD en paralelo
-    this.scene.launch('SceneP1')
-    this.scene.launch('SceneP2')
-    this.scene.launch('HUDScene')
-    // PreloadScene se detiene — ya no hace nada
-    this.scene.stop()
-
-    const musica = this.sound.add('musica-menu', { loop: true, volume: 0.5 });
-    musica.play();
-
-    // Activar el despertador por si el navegador bloquea el autoplay
-    window.addEventListener('click', () => {
-        if (this.sound && typeof this.sound.resumeAll === 'function') {
-            this.sound.resumeAll();
-        }
-        if (!musica.isPlaying) {
-            musica.play();
-        }
-    }, { once: true });
-
-    // Al final, tu cambio de escena al menú principal
-    this.scene.start('MainMenuScene');
-}
+    // El menú principal real ahora vive en HomeView.vue (Vue), no en Phaser.
+    // Cuando el usuario entra aquí ya hizo clic en "NUEVA PARTIDA" en Vue,
+    // así que vamos directo a las instrucciones del puzle.
+    this.scene.start('InstructionsScene')
   }
+}

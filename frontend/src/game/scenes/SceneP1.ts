@@ -4,13 +4,15 @@ import { ROOM_01_OBJECTS } from '../data/interactable'
 import { gameBus } from '@/composables/useGameEventBus'
 import { puzzle1State, type TeddyPart } from '../state/puzzle1State'
 import { Door } from '../objects/Door'
+import { DebugHitboxes } from '../objects/DebugHitboxes'
+import { findNearestInteractable } from '../utils/proximity'
 
 
 const WORLD_W  = 1280
 const WORLD_H  = 720
 const SPEED    = 180
 const FLOOR_Y  = WORLD_H * 0.72
-const INTERACT_DIST = 80
+const INTERACT_MARGIN = 48 // distancia máxima desde el BORDE del objeto, no desde su centro
 
 export class SceneP1 extends Phaser.Scene {
   private player!:  Player
@@ -25,6 +27,7 @@ export class SceneP1 extends Phaser.Scene {
   private inspectText!: Phaser.GameObjects.Text
   private inspectTextTimer?: Phaser.Time.TimerEvent
   private wallColliders!: Phaser.Physics.Arcade.StaticGroup
+  private furnitureColliders!: Phaser.Physics.Arcade.StaticGroup
 
   private teddyPanel!: Phaser.GameObjects.Container
   private teddyPanelText!: Phaser.GameObjects.Text
@@ -35,6 +38,7 @@ export class SceneP1 extends Phaser.Scene {
 
   private door!: Door
   private doorObstacle!: Phaser.Physics.Arcade.Image
+  private debugHitboxes!: DebugHitboxes
 
   constructor() { super({ key: 'SceneP1' }) }
 
@@ -58,6 +62,7 @@ export class SceneP1 extends Phaser.Scene {
 
     this.player = new Player(this, 300, FLOOR_Y - 40, 1, WORLD_W, WORLD_H)
     this.createWallColliders()
+    this.createFurnitureColliders()
 
     this.door = new Door(this, 570, 150, 'door-closed')
     this.physics.add.collider(this.player.body, this.door.sprite)
@@ -98,6 +103,12 @@ export class SceneP1 extends Phaser.Scene {
     this.createTeddyPanel()
 
     this.keyE.on('down', () => this.tryInteract())
+
+    // ── Debug visual de hitboxes (F1 para activar/desactivar) ───────────
+    this.debugHitboxes = new DebugHitboxes(this)
+    this.debugHitboxes.trackStaticGroup(this.wallColliders, 0xff0000)      // paredes: rojo
+    this.debugHitboxes.trackStaticGroup(this.furnitureColliders, 0xff8800) // muebles: naranja
+    this.debugHitboxes.trackInteractables(ROOM_01_OBJECTS, 0x00ff00)       // interactuables: verde
   }
 
   update() {
@@ -117,6 +128,7 @@ export class SceneP1 extends Phaser.Scene {
     this.player.moveFree(vx, vy)
     this.player.updateLabel()
     this.checkProximity()
+    this.debugHitboxes.refresh()
   }
 
   /**
@@ -203,13 +215,7 @@ export class SceneP1 extends Phaser.Scene {
 
   private checkProximity() {
     const { x, y } = this.player.getPosition()
-    let nearest: typeof ROOM_01_OBJECTS[0] | null = null
-    let minDist = INTERACT_DIST
-
-    for (const obj of ROOM_01_OBJECTS) {
-      const dist = Phaser.Math.Distance.Between(x, y, obj.x, obj.y)
-      if (dist < minDist) { minDist = dist; nearest = obj }
-    }
+    const nearest = findNearestInteractable(x, y, ROOM_01_OBJECTS, INTERACT_MARGIN)
 
     if (nearest) {
       const cam = this.cameras.main
@@ -230,26 +236,23 @@ export class SceneP1 extends Phaser.Scene {
     if (this.isPuzzlePanelOpen) return
 
     const { x, y } = this.player.getPosition()
-    for (const obj of ROOM_01_OBJECTS) {
-      const dist = Phaser.Math.Distance.Between(x, y, obj.x, obj.y)
-      if (dist < INTERACT_DIST) {
-        const cam = this.cameras.main
-        const sx  = (obj.x - cam.scrollX) * cam.zoom
-        const sy  = (obj.y - cam.scrollY) * cam.zoom - 60
+    const obj = findNearestInteractable(x, y, ROOM_01_OBJECTS, INTERACT_MARGIN)
+    if (!obj) return
 
-        this.showInspectMessage(obj.descriptionP1)
-        this.openTeddyPanel()
+    const cam = this.cameras.main
+    const sx  = (obj.x - cam.scrollX) * cam.zoom
+    const sy  = (obj.y - cam.scrollY) * cam.zoom - 60
 
-        gameBus.emit('p1:interact', {
-          objectId:    obj.id,
-          description: obj.descriptionP1,
-          actions:     obj.actions ?? [],
-          screenX:     sx,
-          screenY:     sy,
-        })
-        return
-      }
-    }
+    this.showInspectMessage(obj.descriptionP1)
+    this.openTeddyPanel()
+
+    gameBus.emit('p1:interact', {
+      objectId:    obj.id,
+      description: obj.descriptionP1,
+      actions:     obj.actions ?? [],
+      screenX:     sx,
+      screenY:     sy,
+    })
   }
 
   private showInspectMessage(message: string) {
@@ -411,6 +414,33 @@ export class SceneP1 extends Phaser.Scene {
   private closeTeddyPanel() {
     this.isPuzzlePanelOpen = false
     this.teddyPanel.setVisible(false)
+  }
+
+  /**
+   * Obstáculos físicos puramente decorativos: cama, escritorios, mesa y banquitos.
+   * Solo bloquean el paso — no son interactuables (no van en ROOM_01_OBJECTS).
+   * Coordenadas estimadas sobre bg-stage1; calibrar con F1 (DebugHitboxes) contra el fondo real.
+   */
+  private createFurnitureColliders() {
+    this.furnitureColliders = this.physics.add.staticGroup()
+
+    const muebles = [
+      { x: 195,  y: 275, w: 150, h: 190 }, // cama
+      { x: 960,  y: 215, w: 140, h: 100 }, // escritorio con espejo
+      { x: 1145, y: 385, w: 120, h: 150 }, // mesa con dibujos/lápices
+      { x: 120,  y: 535, w: 40,  h: 36 },  // banquito izquierdo
+      { x: 320,  y: 525, w: 44,  h: 40 },  // banquito con planta
+    ]
+
+    for (const m of muebles) {
+      this.furnitureColliders
+        .create(m.x, m.y, '__DEFAULT')
+        .setDisplaySize(m.w, m.h)
+        .setAlpha(0)
+        .refreshBody()
+    }
+
+    this.physics.add.collider(this.player.body, this.furnitureColliders)
   }
 
   private buildRoom() {
