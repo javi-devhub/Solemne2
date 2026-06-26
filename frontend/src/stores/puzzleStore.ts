@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Puzzle } from '@/types/puzzle'
+import type { Puzzle } from '../types/puzzle'
 
 export type ActionResult = 'correct' | 'wrong' | 'idle'
 

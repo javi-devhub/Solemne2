@@ -20,6 +20,7 @@
         <h2 class="pause-title">PAUSA</h2>
         <div class="pause-divider" />
         <button class="pause-btn" @click="resumeGame">CONTINUAR</button>
+        <button class="pause-btn" @click="handleSaveGame">GUARDAR PARTIDA</button>
         <button class="pause-btn" @click="goHome">MENÚ PRINCIPAL</button>
       </div>
     </div>
@@ -43,12 +44,17 @@ import { useGlitchStore }     from '@/stores/glitchStore'
 import { useScreamerStore }   from '@/stores/screamerStore'
 import { gameBus }            from '@/composables/useGameEventBus'
 import { getGame }            from '@/game/mainGame'
+import { usePlayerStore }     from '@/stores/playerStore'
+import { usePuzzleStore }     from '@/stores/puzzleStore'
+import { saveProgress }       from '@/services/progressService'
 
 const router        = useRouter()
 const invStore      = useInventoryStore()
 const gameStore     = useGameStore()
 const glitchStore   = useGlitchStore()
 const screamerStore = useScreamerStore()
+const playerStore   = usePlayerStore()
+const puzzleStore   = usePuzzleStore()
 
 const isPaused = ref(false)
 
@@ -85,6 +91,129 @@ function goHome() {
   router.push('/')
 }
 
+async function handleSaveGame() {
+  try {
+    console.log('Estado puzzle antes de guardar:', {
+  puzzle01Solved: puzzleStore.puzzle01Solved,
+  p1Sequence: puzzleStore.p1Sequence,
+  correctSequence: puzzleStore.correctSequence,
+})
+    const progress = await saveProgress({
+      scene: `SceneP${gameStore.currentScene}`,
+      players: {
+        p1: {
+          position: playerStore.player1.position,
+          health: playerStore.player1.health,
+          sanity: playerStore.player1.sanity,
+          isAlive: playerStore.player1.isAlive,
+        },
+        p2: {
+          position: playerStore.player2.position,
+          health: playerStore.player2.health,
+          sanity: playerStore.player2.sanity,
+          isAlive: playerStore.player2.isAlive,
+        },
+      },
+      inventory: {
+        p1: invStore.player1Items,
+        p2: invStore.player2Items,
+      },
+      solvedPuzzles: puzzleStore.puzzle01Solved ? ['puzzle-01'] : [],
+      flags: {
+        currentScene: gameStore.currentScene,
+        tension: gameStore.tension,
+        sessionTime: gameStore.sessionTime,
+        puzzle01Solved: puzzleStore.puzzle01Solved,
+        p1Sequence: puzzleStore.p1Sequence,
+      },
+      playTimeSeconds: gameStore.sessionTime,
+    })
+
+    gameStore.setHasSave(true)
+    console.log('Partida guardada:', progress)
+    alert('Partida guardada correctamente')
+  } catch (error) {
+    console.error('Error al guardar partida:', error)
+    alert('No se pudo guardar la partida. Revisa si estás logeado.')
+  }
+}
+
+function applyLoadedProgressToStores() {
+  const progress = gameStore.savedProgress
+  if (!progress) return
+
+  console.log('Aplicando progreso cargado antes de iniciar GameCanvas:', progress)
+
+  const flags = progress.flags as {
+    currentScene?: number
+    tension?: number
+    sessionTime?: number
+    puzzle01Solved?: boolean
+    p1Sequence?: string[]
+  }
+
+  const solvedPuzzles = progress.solvedPuzzles ?? []
+  const savedSequence = Array.isArray(flags?.p1Sequence)
+    ? flags.p1Sequence
+    : []
+
+  const puzzle01WasSolved =
+    flags?.puzzle01Solved === true || solvedPuzzles.includes('puzzle-01')
+
+  // Restaurar progreso parcial del jugador 1
+  puzzleStore.p1Sequence = [...savedSequence]
+
+  // Restaurar resultado visual/lógico básico
+  if (puzzle01WasSolved) {
+    puzzleStore.puzzle01Solved = true
+    puzzleStore.p1Sequence = [...puzzleStore.correctSequence]
+    puzzleStore.lastActionResult = 'correct'
+  } else if (savedSequence.length > 0) {
+    puzzleStore.puzzle01Solved = false
+    puzzleStore.lastActionResult = 'correct'
+  }
+
+  console.log('Estado puzzle después de aplicar carga:', {
+    puzzle01Solved: puzzleStore.puzzle01Solved,
+    p1Sequence: puzzleStore.p1Sequence,
+    lastActionResult: puzzleStore.lastActionResult,
+  })
+}
+
+function applyLoadedProgressToRegisteredPuzzles() {
+  const progress = gameStore.savedProgress
+  if (!progress) return
+
+  const flags = progress.flags as {
+    puzzle01Solved?: boolean
+    p1Sequence?: string[]
+  }
+
+  const solvedPuzzles = progress.solvedPuzzles ?? []
+  const savedSequence = Array.isArray(flags?.p1Sequence)
+    ? flags.p1Sequence
+    : []
+
+  const puzzle01WasSolved =
+    flags?.puzzle01Solved === true || solvedPuzzles.includes('puzzle-01')
+
+  if (puzzle01WasSolved) {
+    puzzleStore.puzzle01Solved = true
+    puzzleStore.p1Sequence = [...puzzleStore.correctSequence]
+    puzzleStore.lastActionResult = 'correct'
+    puzzleStore.solvePuzzle('puzzle-01')
+  } else if (savedSequence.length > 0) {
+    puzzleStore.p1Sequence = [...savedSequence]
+    puzzleStore.lastActionResult = 'correct'
+  }
+
+  console.log('Estado puzzle después de registrar escenas:', {
+    puzzle01Solved: puzzleStore.puzzle01Solved,
+    p1Sequence: puzzleStore.p1Sequence,
+    puzzles: puzzleStore.puzzles,
+  })
+}
+
 function onKeyDown(e: KeyboardEvent) {
   switch (e.key) {
     case 'i': case 'I':
@@ -101,8 +230,21 @@ function onKeyDown(e: KeyboardEvent) {
   }
 }
 
+applyLoadedProgressToStores()
+
 onMounted(() => {
   gameStore.setPhase('playing')
+
+  applyLoadedProgressToRegisteredPuzzles()
+
+  setTimeout(() => {
+    applyLoadedProgressToRegisteredPuzzles()
+  }, 300)
+
+  setTimeout(() => {
+    applyLoadedProgressToRegisteredPuzzles()
+  }, 1000)
+
   window.addEventListener('keydown', onKeyDown)
 
   gameBus.on('glitch:trigger', (ms) => {
@@ -110,7 +252,6 @@ onMounted(() => {
     glitchStore.trigger(ms)
   })
 
-  // Screamer aleatorio entre 30s y 90s
   screamerStore.startRandom(15000, 45000)
 })
 
