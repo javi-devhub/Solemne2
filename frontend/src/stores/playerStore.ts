@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { PlayerState } from '@/types/player'
+import type { PlayerState } from '../types/player'
 
 const defaultPlayer1 = (): PlayerState => ({
   id: 1,

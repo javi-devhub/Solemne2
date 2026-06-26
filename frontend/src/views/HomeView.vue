@@ -68,6 +68,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '@/stores/gameStore'
+import { loadProgress } from '@/services/progressService'
 
 const router    = useRouter()
 const gameStore = useGameStore()
@@ -91,8 +92,8 @@ const menuItems: MenuItem[] = [
   {
     id: 'continue',
     label: 'CONTINUAR',
-    disabled: !gameStore.hasSave,
-    action: () => { if (gameStore.hasSave) router.push('/game') },
+    disabled: false,
+    action: continueGame,
   },
   {
     id: 'options',
@@ -113,6 +114,27 @@ const menuItems: MenuItem[] = [
 
 function handleClick(item: MenuItem) {
   if (!item.disabled) item.action()
+}
+
+async function continueGame() {
+  try {
+    const progress = await loadProgress()
+
+    gameStore.setSavedProgress({
+      scene: progress.scene,
+      players: progress.players ?? {},
+      inventory: progress.inventory ?? {},
+      solvedPuzzles: progress.solvedPuzzles ?? [],
+      flags: progress.flags ?? {},
+      playTimeSeconds: progress.playTimeSeconds ?? 0,
+    })
+
+    router.push('/game')
+  } catch (error) {
+    console.error('No se pudo cargar la partida:', error)
+    gameStore.setHasSave(false)
+    alert('No existe una partida guardada o debes iniciar sesión.')
+  }
 }
 
 function onKeyDown(e: KeyboardEvent) {
@@ -232,6 +254,18 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
   flex-direction: column;
   gap: 0;
   margin-bottom: 22px;
+}
+
+.progress-test {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+.test-btn {
+  font-size: 0.65rem;
+  color: #666;
 }
 
 .menu-btn {
