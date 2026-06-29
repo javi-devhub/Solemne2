@@ -96,6 +96,11 @@ const menuItems: MenuItem[] = [
     action: continueGame,
   },
   {
+    id: 'login',
+    label: 'LOGIN',
+    action: goToLogin,
+  },
+  {
     id: 'options',
     label: 'OPCIONES',
     action: () => { /* TODO */ },
@@ -111,6 +116,10 @@ const menuItems: MenuItem[] = [
     action: () => { window.close() },
   },
 ]
+
+function goToLogin() {
+  router.push('/auth')
+}
 
 function handleClick(item: MenuItem) {
   if (!item.disabled) item.action()

@@ -7,6 +7,7 @@ import { Door } from '../objects/Door'
 import { DebugHitboxes } from '../objects/DebugHitboxes'
 import { findNearestInteractable } from '../utils/proximity'
 
+import { usePuzzleStore } from '@/stores/puzzleStore'
 
 const WORLD_W  = 1280
 const WORLD_H  = 720
@@ -35,6 +36,7 @@ export class SceneP1 extends Phaser.Scene {
   private teddyParts: TeddyPart[] = ['oreja', 'nariz', 'brazo']
   private isPuzzlePanelOpen = false
   private solvedMessageShown = false
+  private puzzleStore!: ReturnType<typeof usePuzzleStore>
 
   private door!: Door
   private doorObstacle!: Phaser.Physics.Arcade.Image
@@ -51,7 +53,12 @@ export class SceneP1 extends Phaser.Scene {
   }
 
   create() {
+    this.puzzleStore = usePuzzleStore()
+
+    if (!this.puzzleStore.puzzle01Solved) {
     puzzle1State.reset()
+    }
+
     this.solvedMessageShown = false
 
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H)
@@ -364,16 +371,26 @@ export class SceneP1 extends Phaser.Scene {
     }
 
     if (Phaser.Input.Keyboard.JustDown(this.keyE)) {
-      const selectedPart = this.teddyParts[this.teddySelectedIndex]
-      const result = puzzle1State.rotatePart(selectedPart)
-      this.showInspectMessage(result.messageP1)
-      this.refreshTeddyPanel()
+    const selectedPart = this.teddyParts[this.teddySelectedIndex]
+    const result = puzzle1State.rotatePart(selectedPart)
 
-      if (result.ok === false) {
-        this.triggerGlitch()
-      }
+    if (result.ok) {
+    const actionMap: Record<TeddyPart, string> = {
+      oreja: 'girar',
+      nariz: 'presionar',
+      brazo: 'soltar',
     }
 
+    this.puzzleStore.executeAction(actionMap[selectedPart])
+  }
+
+    this.showInspectMessage(result.messageP1)
+    this.refreshTeddyPanel()
+
+    if (result.ok === false) {
+     this.triggerGlitch()
+  }
+}
     if (puzzle1State.solved && !this.solvedMessageShown) {
       this.solvedMessageShown = true
       this.showInspectMessage('¡Confirmado! La puerta se desbloqueó.')
