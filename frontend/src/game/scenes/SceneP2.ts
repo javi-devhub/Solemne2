@@ -4,13 +4,10 @@ import { ROOM_01_OBJECTS } from '../data/interactable'
 import { gameBus } from '@/composables/useGameEventBus'
 import { puzzle1State } from '../state/puzzle1State'
 import { Door } from '../objects/Door'
-<<<<<<< HEAD
 import { DebugHitboxes } from '../objects/DebugHitboxes'
 import { findNearestInteractable } from '../utils/proximity'
 
-=======
 import { usePuzzleStore } from '@/stores/puzzleStore'
->>>>>>> 08f648e (Conectar guardado de progreso del puzzle)
 const WORLD_W       = 1280
 const WORLD_H       = 720
 const SPEED         = 180
