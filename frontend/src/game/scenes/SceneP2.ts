@@ -4,9 +4,13 @@ import { ROOM_01_OBJECTS } from '../data/interactable'
 import { gameBus } from '@/composables/useGameEventBus'
 import { puzzle1State } from '../state/puzzle1State'
 import { Door } from '../objects/Door'
+<<<<<<< HEAD
 import { DebugHitboxes } from '../objects/DebugHitboxes'
 import { findNearestInteractable } from '../utils/proximity'
 
+=======
+import { usePuzzleStore } from '@/stores/puzzleStore'
+>>>>>>> 08f648e (Conectar guardado de progreso del puzzle)
 const WORLD_W       = 1280
 const WORLD_H       = 720
 const SPEED         = 180
@@ -27,6 +31,7 @@ export class SceneP2 extends Phaser.Scene {
   private devicePanel!: Phaser.GameObjects.Container
   private devicePanelText!: Phaser.GameObjects.Text
   private isDevicePanelOpen = false
+  private puzzleStore!: ReturnType<typeof usePuzzleStore>
 
   private inspectText!: Phaser.GameObjects.Text
   private inspectTextTimer?: Phaser.Time.TimerEvent
@@ -49,6 +54,7 @@ export class SceneP2 extends Phaser.Scene {
   }
 
   create() {
+    this.puzzleStore = usePuzzleStore()
     // Resetear estado al iniciar (nueva partida)
     this.door2Solved = false
 
@@ -315,9 +321,14 @@ private handleEnterOnDevice() {
   const result = puzzle1State.confirmDevice()
 
   if (result.confirmed) {
-    // Puzzle resuelto: mensaje + refrescar panel (las puertas se abren en update())
-    this.showInspectMessage('¡Confirmado! La puerta se desbloqueó.')
-    this.refreshDevicePanel()
+  this.puzzleStore.puzzle01Solved = true
+  this.puzzleStore.p1Sequence = [...this.puzzleStore.correctSequence]
+  this.puzzleStore.solvePuzzle('puzzle-01')
+
+  // Puzzle resuelto: mensaje + refrescar panel (las puertas se abren en update())
+  this.showInspectMessage('¡Confirmado! La puerta se desbloqueó.')
+  this.refreshDevicePanel()
+ 
   } else {
     // Solo refrescar lectura
     this.refreshDevicePanel()
