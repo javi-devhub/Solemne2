@@ -281,7 +281,7 @@ Authorization: Bearer <token>
 | ------ | --------------- | --------------------------------------------------------------- | ---- |
 | GET    | `/api/progress` | Obtiene el progreso del usuario autenticado                     | JWT  |
 | POST   | `/api/progress` | Crea o actualiza el progreso de la partida                      | JWT  |
-| DELETE | `/api/progress` | Elimina el progreso del usuario para comenzar una nueva partida | JWT  |
+| GET | `/api/progress/:slot` | Obtiene el progreso por slot                                 | JWT  |
 
 #### Clima
 
