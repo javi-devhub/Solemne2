@@ -12,6 +12,13 @@
       <!-- Tagline -->
       <p class="tagline">— La verdad tiene dos lados. —</p>
 
+      <p class="weather-info" v-if="weatherAtmosphere">
+      Atmósfera:
+      {{ weatherAtmosphere.condition }} ·
+      {{ weatherAtmosphere.temperature }}°C ·
+      {{ weatherAtmosphere.isNight ? 'Noche' : 'Día' }}
+      </p>
+
       <!-- Botones -->
       <nav class="menu-nav">
         <button
@@ -69,9 +76,14 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '@/stores/gameStore'
 import { loadProgress } from '@/services/progressService'
+import { getWeatherAtmosphere, type WeatherAtmosphere } from '@/services/restService'
+import { useWeatherStore } from '@/stores/weatherStore'
+
 
 const router    = useRouter()
 const gameStore = useGameStore()
+const weatherAtmosphere = ref<WeatherAtmosphere | null>(null)
+const weatherStore = useWeatherStore()
 
 const ready         = ref(false)
 const selectedIndex = ref(0)
@@ -164,10 +176,19 @@ function onKeyDown(e: KeyboardEvent) {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   setTimeout(() => { ready.value = true }, 150)
+
+  try {
+    const atmosphere = await getWeatherAtmosphere()
+    weatherStore.setAtmosphere(atmosphere)
+  } catch (error) {
+    console.error('No se pudo cargar el clima:', error)
+  }
+
   window.addEventListener('keydown', onKeyDown)
 })
+
 onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
 </script>
 
@@ -203,6 +224,16 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
   opacity: 0;
   transform: translateY(8px);
   transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.weather-info {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: #555;
+  margin-bottom: 18px;
+  text-align: center;
+  max-width: 500px;
 }
 
 .menu-panel.visible {

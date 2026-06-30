@@ -1,5 +1,5 @@
 <template>
-  <div class="game-view">
+  <div class="game-view" :class="atmosphereClass">
     <GameCanvas />
 
     <InventoryOverlay
@@ -25,6 +25,10 @@
       </div>
     </div>
 
+    <div class="weather-layer rain-layer" />
+    <div class="weather-layer thunder-layer" />
+    <div class="weather-layer mist-layer" />
+
     <!-- Overlays fuera del panel de pausa para que cubran toda la pantalla -->
     <GlitchOverlay :active="glitchStore.active" />
     <ScreamerOverlay :active="screamerStore.active" />
@@ -47,6 +51,8 @@ import { getGame }            from '@/game/mainGame'
 import { usePlayerStore }     from '@/stores/playerStore'
 import { usePuzzleStore }     from '@/stores/puzzleStore'
 import { saveProgress }       from '@/services/progressService'
+import { computed } from 'vue'
+import { useWeatherStore } from '@/stores/weatherStore'
 
 const router        = useRouter()
 const invStore      = useInventoryStore()
@@ -55,6 +61,17 @@ const glitchStore   = useGlitchStore()
 const screamerStore = useScreamerStore()
 const playerStore   = usePlayerStore()
 const puzzleStore   = usePuzzleStore()
+const weatherStore = useWeatherStore()
+
+const atmosphereClass = computed(() => {
+  const condition = weatherStore.atmosphere?.condition
+
+  if (condition === 'rain') return 'weather-rain'
+  if (condition === 'thunderstorm') return 'weather-thunderstorm'
+  if (condition === 'mist') return 'weather-mist'
+
+  return 'weather-normal'
+})
 
 const isPaused = ref(false)
 
@@ -274,6 +291,87 @@ onUnmounted(() => {
   height: 100vh;
   background: #000;
   overflow: hidden;
+}
+
+.weather-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* rain → ambiente lluvioso */
+.rain-layer {
+  display: none;
+}
+
+.weather-rain .rain-layer {
+  display: block;
+  background-image: repeating-linear-gradient(
+    115deg,
+    rgba(180, 200, 255, 0.12) 0,
+    rgba(180, 200, 255, 0.12) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+  animation: rainMove 0.45s linear infinite;
+  opacity: 0.35;
+}
+
+@keyframes rainMove {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -30px 60px;
+  }
+}
+
+/* thunderstorm → parpadeo */
+.thunder-layer {
+  display: none;
+}
+
+.weather-thunderstorm .thunder-layer {
+  display: block;
+  background: rgba(255, 255, 255, 0.18);
+  animation: thunderFlash 3.8s infinite;
+}
+
+@keyframes thunderFlash {
+  0%, 85%, 100% {
+    opacity: 0;
+  }
+
+  86% {
+    opacity: 0.8;
+  }
+
+  88% {
+    opacity: 0;
+  }
+
+  91% {
+    opacity: 0.55;
+  }
+
+  94% {
+    opacity: 0;
+  }
+}
+
+/* mist / fog → reducción de visión */
+.mist-layer {
+  display: none;
+}
+
+.weather-mist .mist-layer {
+  display: block;
+  background:
+    radial-gradient(circle at center, transparent 0%, transparent 35%, rgba(220, 220, 220, 0.35) 70%),
+    rgba(180, 180, 180, 0.18);
+  backdrop-filter: blur(2px);
+  opacity: 0.8;
 }
 
 .pause-overlay {
