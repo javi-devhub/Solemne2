@@ -1,6 +1,7 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
+import weatherRoutes from './routes/weather.js'
 
 import authRoutes from './routes/auth.js';
 import progressRoutes from './routes/progress.js';
@@ -31,5 +32,6 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/progress', progressRoutes);
+app.use('/api/weather', weatherRoutes)
 
 export default app;

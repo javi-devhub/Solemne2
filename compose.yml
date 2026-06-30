@@ -21,6 +21,7 @@ services:
       MONGODB_URI: mongodb://mongo:27017/shirokuro
       JWT_SECRET: shirokuro_desarrollo_cambiar_en_produccion
       FRONTEND_URL: http://localhost:8080
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
     depends_on:
       - mongo
 
