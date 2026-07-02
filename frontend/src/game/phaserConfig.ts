@@ -1,6 +1,8 @@
 import { PreloadScene } from './scenes/PreloadScene';
 import { SceneP1 } from './scenes/SceneP1';
 import { SceneP2 } from './scenes/SceneP2';
+import { SceneRoom2P1 } from './scenes/SceneRoom2P1';
+import { SceneRoom2P2 } from './scenes/SceneRoom2P2';
 import { HUDScene } from './scenes/HUDScene';
 import { InstructionsScene } from './scenes/InstructionsScene';
 
@@ -30,6 +32,6 @@ export function createPhaserConfig(parent: HTMLElement): Phaser.Types.Core.GameC
             disableWebAudio: true // Fuerza a usar HTML5 Audio, ideal para romper bloqueos de inicio
         },
         
-    scene: [PreloadScene, InstructionsScene, SceneP1, SceneP2, HUDScene],
+    scene: [PreloadScene, InstructionsScene, SceneP1, SceneP2, SceneRoom2P1, SceneRoom2P2, HUDScene],
   }
 }

@@ -10,7 +10,7 @@ export const usePuzzleStore = defineStore('puzzle', () => {
 
   // Puzzle 01 — secuencia de acciones
   const p1Sequence     = ref<string[]>([])   // acciones ejecutadas
-  const correctSequence = ['girar', 'presionar', 'soltar']
+  const correctSequence = ref<string[]>(['girar', 'presionar', 'soltar'])
   const lastActionResult = ref<ActionResult>('idle')
   const puzzle01Solved  = ref(false)
 
@@ -44,10 +44,10 @@ export const usePuzzleStore = defineStore('puzzle', () => {
   function executeAction(actionId: string): ActionResult {
     if (puzzle01Solved.value) return 'idle'
 
-    const expected = correctSequence[p1Sequence.value.length]
+    const expected = correctSequence.value[p1Sequence.value.length]
     if (actionId === expected) {
       p1Sequence.value.push(actionId)
-      if (p1Sequence.value.length === correctSequence.length) {
+      if (p1Sequence.value.length === correctSequence.value.length) {
         puzzle01Solved.value = true
         solvePuzzle('puzzle-01')
         lastActionResult.value = 'correct'

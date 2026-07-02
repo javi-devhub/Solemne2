@@ -174,50 +174,24 @@ export class SceneP1 extends Phaser.Scene {
         // ── ACTUALIZACIÓN DE CIERRE: NO REGRESA LA CÁMARA, DISPARA LA IMAGEN FINAL ──
         // Esperamos 1.3 segundos para ver la animación completa de tu puerta abrirse
         this.time.delayedCall(1300, () => {
-          this.showEndPuzzleScreen()
+          this.transitionToRoom2()
         })
       }
     })
   }
 
   /**
-   * Muestra la pantalla estática de éxito rompiendo el split-screen por completo
+   * Puzzle 1 resuelto: cierra la Habitación 01 y abre la Habitación 02
+   * ("Las marcas en la pared") para ambas jugadoras.
    */
-  private showEndPuzzleScreen() {
-    // 1. Buscamos y apagamos por completo la cámara de P2 para que no dibuje en el lado derecho
-    const sceneP2 = this.scene.get('SceneP2')
-    if (sceneP2 && sceneP2.cameras && sceneP2.cameras.main) {
-      sceneP2.cameras.main.setVisible(false)
-    }
+  private transitionToRoom2() {
+    this.scene.stop('SceneP1')
+    this.scene.stop('SceneP2')
+    this.scene.stop('HUDScene')
 
-    // 2. Buscamos y apagamos la cámara del HUD si existe
-    const hudScene = this.scene.get('HUDScene')
-    if (hudScene && hudScene.cameras && hudScene.cameras.main) {
-      hudScene.cameras.main.setVisible(false)
-    }
-
-    // 3. Forzamos a la cámara de P1 a estirarse a los 1280x720 del monitor global
-    const cam = this.cameras.main
-    cam.setViewport(0, 0, 1280, 720)
-    cam.setBounds(0, 0, 1280, 720)
-
-    // 4. Creamos un gran fondo negro que cubra todo el nuevo tamaño de pantalla
-    const blackBg = this.add.rectangle(640, 360, 1280, 720, 0x000000)
-    blackBg.setScrollFactor(0).setDepth(9999)
-
-    // 5. Colocamos tu imagen 'fin-puzzle' centrada de forma absoluta (640, 360)
-    const endImage = this.add.image(640, 360, 'fin-puzzle')
-    endImage.setScrollFactor(0).setDepth(10000) // Depth ultra alto
-    
-    // Forzamos el renderizado Pixel Art nítido
-    if (endImage.texture) {
-      endImage.texture.setFilter(Phaser.Textures.FilterMode.NEAREST)
-    }
-
-    // 6. Escalamos la imagen para obligarla a cubrir toda la resolución de 1280x720
-    endImage.setDisplaySize(1280, 720)
-
-    console.log("Pantalla completa finpuzzle1.png desplegada rompiendo el split-screen.");
+    this.scene.start('SceneRoom2P1')
+    this.scene.launch('SceneRoom2P2')
+    this.scene.launch('HUDScene')
   }
 
   private checkProximity() {

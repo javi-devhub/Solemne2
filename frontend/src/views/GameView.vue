@@ -30,22 +30,25 @@
     <div class="weather-layer mist-layer" />
 
     <!-- Overlays fuera del panel de pausa para que cubran toda la pantalla -->
+    <ShadowPressureOverlay :active="shadowStore.active" :progress="shadowStore.progress" />
     <GlitchOverlay :active="glitchStore.active" />
     <ScreamerOverlay :active="screamerStore.active" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import GameCanvas        from '@/components/game/GameCanvas.vue'
 import InventoryOverlay  from '@/components/game/InventoryOverlay.vue'
 import GlitchOverlay     from '@/components/game/GlitchOverlay.vue'
 import ScreamerOverlay   from '@/components/game/ScreamerOverlay.vue'
+import ShadowPressureOverlay from '@/components/game/ShadowPressureOverlay.vue'
 import { useInventoryStore }  from '@/stores/inventoryStore'
 import { useGameStore }       from '@/stores/gameStore'
 import { useGlitchStore }     from '@/stores/glitchStore'
 import { useScreamerStore }   from '@/stores/screamerStore'
+import { useShadowPressureStore } from '@/stores/shadowPressureStore'
 import { gameBus }            from '@/composables/useGameEventBus'
 import { getGame }            from '@/game/mainGame'
 import { usePlayerStore }     from '@/stores/playerStore'
@@ -59,6 +62,7 @@ const invStore      = useInventoryStore()
 const gameStore     = useGameStore()
 const glitchStore   = useGlitchStore()
 const screamerStore = useScreamerStore()
+const shadowStore   = useShadowPressureStore()
 const playerStore   = usePlayerStore()
 const puzzleStore   = usePuzzleStore()
 const weatherStore = useWeatherStore()
@@ -268,8 +272,15 @@ onMounted(() => {
     console.log('glitch:trigger recibido en GameView', ms)
     glitchStore.trigger(ms)
   })
+})
 
-  screamerStore.startRandom(15000, 45000)
+// La sombra del Puzzle 2 llegó hasta las jugadoras: dispara el screamer
+// y reinicia el avance para darles otra oportunidad si el puzzle sigue sin resolverse.
+watch(() => shadowStore.progress, (p) => {
+  if (p >= 1) {
+    screamerStore.trigger(1200)
+    shadowStore.resetProgress()
+  }
 })
 
 onUnmounted(() => {
@@ -281,6 +292,7 @@ onUnmounted(() => {
   gameBus.off('p2:interact')
   gameBus.off('glitch:trigger')
   screamerStore.stop()
+  shadowStore.stop()
 })
 </script>
 
