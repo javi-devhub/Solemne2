@@ -44,13 +44,25 @@ Evitar ejecutar el proyecto desde el Escritorio, Descargas o carpetas sincroniza
 
 ### Instalación de dependencias
 
-Desde la raíz del repositorio, entrar a la carpeta del juego:
-
+Crear un archivo .env en la raíz del proyecto con el siguiente contenido:
 ```bash
-cd Shirokuro
+OPENWEATHER_API_KEY=tu_api_key_de_openweathermap
 ```
 
-Instalar las dependencias del proyecto:
+Crear un archivo backend/.env con el siguiente contenido:
+```bash
+PORT=3001
+MONGODB_URI=mongodb://localhost:27017/shirokuro
+JWT_SECRET=clave_secreta_shirokuro
+OPENWEATHER_API_KEY=tu_api_key_de_openweathermap
+FRONTEND_URL=http://localhost:5173
+```
+
+Crear un archivo frontend/.env con el siguiente contenido:
+```bash
+VITE_API_URL=http://localhost:3001
+```
+Instalar las dependencias del proyecto tanto en el backend como en el frontend:
 
 ```bash
 pnpm install
@@ -60,20 +72,36 @@ pnpm install
 
 ### Ejecutar en modo desarrollo
 
-Para iniciar el servidor de desarrollo:
-
+ejecutar el backend:
 ```bash
+cd backend
+pnpm install
 pnpm dev
 ```
 
-Luego abrir en el navegador:
-
-```text
-http://localhost:3000
+El backend quedará disponible en:
+```bash
+http://localhost:3001
 ```
 
+Endpoints de prueba:
+```bash
+http://localhost:3001/api/health
+http://localhost:3001/api/weather
+```
 ---
 
+Ejecutar frontend:
+```bash
+cd frontend
+pnpm install
+pnpm dev
+```
+
+El frontend local quedará disponible en:
+```bash
+http://localhost:3000
+```
 ### Generar build de producción
 
 Para compilar el proyecto:
@@ -85,20 +113,14 @@ pnpm build
 ---
 
 
-## Ejecución con Docker
+## Ejecución con Docker Compose
 
 El proyecto también puede ejecutarse mediante Docker.
 
-Desde la carpeta `Shirokuro`, construir la imagen:
+Desde la raiz del proyecto, construir la imagen:
 
 ```bash
-docker build -t shirokuro .
-```
-
-Luego ejecutar el contenedor:
-
-```bash
-docker run -p 8080:80 shirokuro
+docker compose up --build
 ```
 
 Abrir en el navegador:
@@ -106,6 +128,18 @@ Abrir en el navegador:
 ```text
 http://localhost:8080
 ```
+
+Para comprobar que el backend está funcionando:
+```text
+http://localhost:3001/api/health
+```
+
+Para comprobar la integración con OpenWeatherMap:
+```text
+http://localhost:3001/api/weather
+```
+
+
 ### Ejecutar desde Docker Hub
 
 https://hub.docker.com/r/dedlis/shirokuro
